@@ -1,0 +1,4 @@
+/target/
+/.idea/
+GeoServerShell.iml
+geoserver-shell.log
