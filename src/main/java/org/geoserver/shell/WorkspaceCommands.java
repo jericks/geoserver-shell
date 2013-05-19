@@ -5,6 +5,7 @@ import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTNamespace;
 import it.geosolutions.geoserver.rest.decoder.RESTWorkspaceList;
+import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import it.geosolutions.geoserver.rest.encoder.GSWorkspaceEncoder;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -38,38 +39,43 @@ public class WorkspaceCommands implements CommandMarker {
     }
 
     @CliCommand(value = "workspace create", help = "Create a workspace.")
-    public void create(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name,
-            @CliOption(key = {"uri"}, mandatory = true, help = "The uri") String uri) throws Exception {
+    public boolean create(
+            @CliOption(key = "name", mandatory = true, help = "The name") String name
+    ) throws Exception {
         GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
-        publisher.createWorkspace(name, URI.create(uri));
+        return publisher.createWorkspace(name);
     }
 
     @CliCommand(value = "workspace get", help = "Get a workspace.")
     public String get(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name) throws Exception {
-        GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
-        RESTNamespace nm = reader.getNamespace(name);
-        return nm.getPrefix() + " " + nm.getURI();
+            @CliOption(key = "name", mandatory = true, help = "The name") String name) throws Exception {
+        String url = geoserver.getUrl() + "/rest/workspaces/" + name + ".xml";
+        String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
+        Element workspaceElement = JDOMBuilder.buildElement(xml);
+        String nm = workspaceElement.getChildText("name");
+        return nm;
     }
 
-    @CliCommand(value = "workspace edit", help = "Edt a workspace.")
-    public boolean update(
+    /*@CliCommand(value = "workspace modify", help = "Modify a workspace.")
+    public boolean modify(
             @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name,
-            @CliOption(key = {"uri"}, mandatory = true, help = "The uri") String uri) throws Exception {
-        GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
-        return publisher.updateNamespace(name, URI.create(uri));
-    }
+            @CliOption(key = "newName", mandatory = true, help = "The new name") String newName
+    ) throws Exception {
+        String url = geoserver.getUrl() + "/rest/workspaces/" + name + ".xml";
+        String xml = "<workspace><name>" + newName + "</name></workspace>";
+        String response = HTTPUtils.put(url,xml, GeoServerRESTPublisher.Format.XML.getContentType(), geoserver.getUser(), geoserver.getPassword());
+        return response != null;
+    }*/
 
     @CliCommand(value = "workspace delete", help = "Delete a workspace.")
     public boolean delete(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name,
-            @CliOption(key = {"recurse"}, mandatory = false, unspecifiedDefaultValue = "false", help = "Whether to delete recursively") boolean recurse) {
+            @CliOption(key = "name", mandatory = true, help = "The name") String name,
+            @CliOption(key = "recurse", mandatory = false, unspecifiedDefaultValue = "false", help = "Whether to delete recursively") boolean recurse) {
         GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         return publisher.removeWorkspace(name, recurse);
     }
 
-    @CliCommand(value = "workspace getdefault", help = "Get the default workspace.")
+    @CliCommand(value = "workspace default get", help = "Get the default workspace.")
     public String getDefault() throws Exception {
         String result = HTTPUtils.get(geoserver.getUrl() + "/rest/workspaces/default.xml", geoserver.getUser(), geoserver.getPassword());
         SAXBuilder builder = new SAXBuilder();
@@ -79,11 +85,12 @@ public class WorkspaceCommands implements CommandMarker {
         return w.getName();
     }
 
-    @CliCommand(value = "workspace setdefault", help = "Set the default workspace.")
-    public void setDefault(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name) throws Exception {
+    @CliCommand(value = "workspace default set", help = "Set the default workspace.")
+    public boolean setDefault(
+            @CliOption(key = "name", mandatory = true, help = "The name") String name) throws Exception {
         GSWorkspaceEncoder encoder = new GSWorkspaceEncoder(name);
         String content = encoder.toString();
         String result = HTTPUtils.putXml(geoserver.getUrl() + "/rest/workspaces/default.xml", content, geoserver.getUser(), geoserver.getPassword());
+        return result != null;
     }
 }
