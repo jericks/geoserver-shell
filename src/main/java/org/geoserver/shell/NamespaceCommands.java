@@ -5,6 +5,8 @@ import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTNamespace;
 import it.geosolutions.geoserver.rest.decoder.RESTWorkspaceList;
+import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
+import it.geosolutions.geoserver.rest.encoder.GSNamespaceEncoder;
 import it.geosolutions.geoserver.rest.encoder.GSWorkspaceEncoder;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -38,52 +40,55 @@ public class NamespaceCommands implements CommandMarker {
     }
 
     @CliCommand(value = "namespace create", help = "Create a namespace.")
-    public void create(
-            @CliOption(key = {"", "prefix"}, mandatory = true, help = "The prefix") String prefix,
-            @CliOption(key = {"uri"}, mandatory = true, help = "The uri") String uri) throws Exception {
+    public boolean create(
+            @CliOption(key = "prefix", mandatory = true, help = "The prefix") String prefix,
+            @CliOption(key = "uri", mandatory = true, help = "The uri") String uri) throws Exception {
         GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
-        publisher.createNamespace(prefix, URI.create(uri));
+        return publisher.createNamespace(prefix, URI.create(uri));
     }
 
     @CliCommand(value = "namespace get", help = "Get a namespace.")
     public String get(
-            @CliOption(key = {"", "prefix"}, mandatory = true, help = "The prefix") String prefix) throws Exception {
+            @CliOption(key = "prefix", mandatory = true, help = "The prefix") String prefix) throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTNamespace nm = reader.getNamespace(prefix);
-        return nm.getPrefix() + " " + nm.getURI();
+        StringBuilder builder = new StringBuilder();
+        builder.append(nm.getPrefix()).append(OsUtils.LINE_SEPARATOR);
+        builder.append(nm.getURI());
+        return builder.toString();
     }
 
-    @CliCommand(value = "namespace edit", help = "Edt a namespace.")
+    @CliCommand(value = "namespace modify", help = "Modify a namespace.")
     public boolean update(
-            @CliOption(key = {"", "prefix"}, mandatory = true, help = "The prefix") String prefix,
-            @CliOption(key = {"uri"}, mandatory = true, help = "The uri") String uri) throws Exception {
+            @CliOption(key = "prefix", mandatory = true, help = "The prefix") String prefix,
+            @CliOption(key = "uri", mandatory = true, help = "The uri") String uri) throws Exception {
         GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         return publisher.updateNamespace(prefix, URI.create(uri));
     }
 
     @CliCommand(value = "namespace delete", help = "Delete a namespace.")
     public boolean delete(
-            @CliOption(key = {"", "prefix"}, mandatory = true, help = "The prefix") String prefix,
-            @CliOption(key = {"recurse"}, mandatory = false, unspecifiedDefaultValue = "false", help = "Whether to delete recursively") boolean recurse) {
+            @CliOption(key = "prefix", mandatory = true, help = "The prefix") String prefix,
+            @CliOption(key = "recurse", mandatory = false, unspecifiedDefaultValue = "false", help = "Whether to delete recursively") boolean recurse) {
         GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         return publisher.removeNamespace(prefix, recurse);
     }
 
-    @CliCommand(value = "namespace getdefault", help = "Get the default namespace.")
+    @CliCommand(value = "namespace default get", help = "Get the default namespace.")
     public String getDefault() throws Exception {
         String result = HTTPUtils.get(geoserver.getUrl() + "/rest/namespaces/default.xml", geoserver.getUser(), geoserver.getPassword());
-        SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(new StringReader(result));
-        Element elem = document.getRootElement();
-        RESTWorkspaceList.RESTShortWorkspace w = new RESTWorkspaceList.RESTShortWorkspace(elem);
-        return w.getName();
+        Element elem = JDOMBuilder.buildElement(result);
+        StringBuilder builder = new StringBuilder();
+        builder.append(elem.getChildText("prefix")).append(OsUtils.LINE_SEPARATOR);
+        builder.append(elem.getChildText("uri"));
+        return builder.toString();
     }
 
-    @CliCommand(value = "namespace setdefault", help = "Set the default namespace.")
-    public void setDefault(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name) throws Exception {
-        GSWorkspaceEncoder encoder = new GSWorkspaceEncoder(name);
-        String content = encoder.toString();
+    @CliCommand(value = "namespace default set", help = "Set the default namespace.")
+    public boolean setDefault(
+            @CliOption(key = "prefix", mandatory = true, help = "The prefix") String prefix) throws Exception {
+        String content = "<namespace><prefix>"+prefix+"</prefix></namespace>";
         String result = HTTPUtils.putXml(geoserver.getUrl() + "/rest/namespaces/default.xml", content, geoserver.getUser(), geoserver.getPassword());
+        return result != null;
     }
 }
