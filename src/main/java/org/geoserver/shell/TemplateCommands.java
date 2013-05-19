@@ -87,7 +87,7 @@ public class TemplateCommands implements CommandMarker {
         return result != null;
     }
 
-    @CliCommand(value = "template update", help = "Update a template.")
+    @CliCommand(value = "template modify", help = "Modify a template.")
     public boolean update(
             @CliOption(key = {"name"}, mandatory = true, help = "The name of the template") String name,
             @CliOption(key = {"file"}, mandatory = true, help = "The template file") File file,
