@@ -28,10 +28,10 @@ public class FeatureTypeCommands implements CommandMarker {
 
     @CliCommand(value = "featuretype list", help = "List feature types.")
     public String list(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "datastore", mandatory = true, help = "The datastore") String datastore
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/datastores/" + datastore + "/featuretypes.xml";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes.xml";
         String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         Element element = JDOMBuilder.buildElement(xml);
         List<Element> elements = element.getChildren("featureType");
@@ -48,10 +48,19 @@ public class FeatureTypeCommands implements CommandMarker {
 
     @CliCommand(value = "featuretype create", help = "Create a feature type.")
     public boolean create(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "datastore", mandatory = true, help = "The datastore") String datastore,
             @CliOption(key = "featuretype", mandatory = true, help = "The featuretype") String featuretype,
             @CliOption(key = "schema", mandatory = true, help = "The schema") String schema,
+            @CliOption(key = "title", mandatory = false, help = "The title") String title,
+            @CliOption(key = "description", mandatory = false, help = "The description") String description,
+            @CliOption(key = "keywords", mandatory = false, help = "The comma delimited list of keywords") String keywords,
+            @CliOption(key = "srs", mandatory = false, help = "The SRS") String srs,
+            @CliOption(key = "projectionpolicy", mandatory = false, help = "The projection policy") String projectionPolicy,
+            @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled,
+            @CliOption(key = "advertised", mandatory = false, unspecifiedDefaultValue = "true", help = "The advertised flag") boolean advertised,
+            @CliOption(key = "maxfeatures", mandatory = false, unspecifiedDefaultValue = "0", help = "The max number of features") int maxFeatures,
+            @CliOption(key = "numdecimals", mandatory = false, unspecifiedDefaultValue = "0", help = "The number of decimals") int numDecimals,
             @CliOption(key = "list", mandatory = false, help = "Determines which feature types are returned (configured, available, available_with_geom, all)", unspecifiedDefaultValue = "configured", specifiedDefaultValue = "configured") String list
     ) throws Exception {
         SimpleFeatureType featureType = DataUtilities.createType(featuretype, schema);
@@ -68,29 +77,74 @@ public class FeatureTypeCommands implements CommandMarker {
             attributesElement.addContent(attributeElement);
         }
         if (featureType.getCoordinateReferenceSystem() != null) {
-            String srs = CRS.lookupIdentifier(featureType.getCoordinateReferenceSystem(), true);
-            if (srs != null) {
-                rootElement.addContent(new Element("srs").setText(srs));
+            String srsId = CRS.lookupIdentifier(featureType.getCoordinateReferenceSystem(), true);
+            if (srsId != null) {
+                rootElement.addContent(new Element("srs").setText(srsId));
             }
+        } else if (srs != null) {
+            rootElement.addContent(new Element("srs").setText(srs));
         }
+        if (title != null) rootElement.addContent(new Element("title").setText(title));
+        if (description != null) rootElement.addContent(new Element("description").setText(description));
+        if (keywords != null) {
+            Element keywordsElement = new Element("keywords");
+            String[] keys = keywords.split(",");
+            for(String key : keys) {
+                keywordsElement.addContent(new Element("keyword").setText(key));
+            }
+            rootElement.addContent(keywordsElement);
+        }
+        if (projectionPolicy != null) rootElement.addContent(new Element("projectionPolicy").setText(projectionPolicy));
+        rootElement.addContent(new Element("enabled").setText(String.valueOf(enabled)));
+        rootElement.addContent(new Element("advertised").setText(String.valueOf(advertised)));
+        rootElement.addContent(new Element("maxFeatures").setText(String.valueOf(maxFeatures)));
+        rootElement.addContent(new Element("numDecimals").setText(String.valueOf(numDecimals)));
         XMLOutputter outputter = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
         String xml = outputter.outputString(document);
-        System.out.println(xml);
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/datastores/" + datastore + "/featuretypes.xml";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes.xml";
         String response = HTTPUtils.post(url, xml, GeoServerRESTPublisher.Format.XML.getContentType(), geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
-    // @TODO Support updating more than bbox, values as key=value key2=value2
     @CliCommand(value = "featuretype modify", help = "Modify a feature type.")
     public boolean modify(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "datastore", mandatory = true, help = "The datastore") String datastore,
             @CliOption(key = "featuretype", mandatory = true, help = "The featuretype") String featuretype,
+            @CliOption(key = "name", mandatory = false, help = "The new name") String name,
+            @CliOption(key = "title", mandatory = false, help = "The title") String title,
+            @CliOption(key = "description", mandatory = false, help = "The description") String description,
+            @CliOption(key = "keywords", mandatory = false, help = "The comma delimited list of keywords") String keywords,
+            @CliOption(key = "srs", mandatory = false, help = "The SRS") String srs,
+            @CliOption(key = "projectionpolicy", mandatory = false, help = "The projection policy") String projectionPolicy,
+            @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled,
+            @CliOption(key = "advertised", mandatory = false, unspecifiedDefaultValue = "true", help = "The advertised flag") boolean advertised,
+            @CliOption(key = "maxfeatures", mandatory = false, unspecifiedDefaultValue = "0", help = "The max number of features") int maxFeatures,
+            @CliOption(key = "numdecimals", mandatory = false, unspecifiedDefaultValue = "0", help = "The number of decimals") int numDecimals,
             @CliOption(key = "recalculate", mandatory = false, help = "Recalculate bounding boxes: nativebbox,latlonbbox", unspecifiedDefaultValue = "") String recalculate
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/datastores/" + datastore + "/featuretypes/" + featuretype + ".xml?recalculate=" + recalculate;
-        String content = "<featureType><name>" + featuretype + "</name></featureType>";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes/" + URLUtil.encode(featuretype) + ".xml?recalculate=" + recalculate;
+        StringBuilder xmlBuilder = new StringBuilder();
+        xmlBuilder.append("<featureType>");
+        if (name != null) xmlBuilder.append("<name>").append(name).append("</name>");
+        if (title != null) xmlBuilder.append("<title>").append(title).append("</title>");
+        if (description != null) xmlBuilder.append("<description>").append(description).append("</description>");
+        if (keywords != null) {
+            xmlBuilder.append("<keywords>");
+            String[] keys = keywords.split(",");
+            for(String key : keys) {
+                xmlBuilder.append("<keyword>").append(key).append("</keyword>");
+            }
+            xmlBuilder.append("</keywords>");
+        }
+        if (srs != null) xmlBuilder.append("<srs>").append(srs).append("</srs>");
+        if (projectionPolicy != null) xmlBuilder.append("<projectionPolicy>").append(projectionPolicy).append("</projectionPolicy>");
+        xmlBuilder.append("<enabled>").append(enabled).append("</enabled>");
+        xmlBuilder.append("<advertised>").append(advertised).append("</advertised>");
+        xmlBuilder.append("<maxFeatures>").append(maxFeatures).append("</maxFeatures>");
+        xmlBuilder.append("<numDecimals>").append(numDecimals).append("</numDecimals>");
+        xmlBuilder.append("</featureType>");
+        String content = xmlBuilder.toString();
         String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
         String response = HTTPUtils.put(url, content, contentType, geoserver.getUser(), geoserver.getPassword());
         return response != null;
@@ -98,22 +152,22 @@ public class FeatureTypeCommands implements CommandMarker {
 
     @CliCommand(value = "featuretype delete", help = "Delete a feature type.")
     public boolean delete(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "datastore", mandatory = true, help = "The datastore") String datastore,
             @CliOption(key = "featuretype", mandatory = true, help = "The featuretype") String featuretype,
             @CliOption(key = "recurse", mandatory = false, help = "Whether to delete all associated layers", unspecifiedDefaultValue = "false", specifiedDefaultValue = "false") boolean recurse
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/datastores/" + datastore + "/featuretypes/" + featuretype + ".xml?recurse=" + recurse;
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes/" + URLUtil.encode(featuretype) + ".xml?recurse=" + recurse;
         return HTTPUtils.delete(url, geoserver.getUser(), geoserver.getPassword());
     }
 
     @CliCommand(value = "featuretype get", help = "Get a feature type.")
     public String get(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "datastore", mandatory = true, help = "The datastore") String datastore,
             @CliOption(key = "featuretype", mandatory = true, help = "The featuretype") String featuretype
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/datastores/" + datastore + "/featuretypes/" + featuretype + ".xml";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes/" + URLUtil.encode(featuretype) + ".xml";
         String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         Element featureTypeElement = JDOMBuilder.buildElement(xml);
         String TAB = "   ";
@@ -121,8 +175,10 @@ public class FeatureTypeCommands implements CommandMarker {
         builder.append(featureTypeElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Native Name: ").append(featureTypeElement.getChildText("nativeName")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Title: ").append(featureTypeElement.getChildText("title")).append(OsUtils.LINE_SEPARATOR);
+        builder.append(TAB).append("Description: ").append(featureTypeElement.getChildText("description")).append(OsUtils.LINE_SEPARATOR);
+        builder.append(TAB).append("Enabled: ").append(featureTypeElement.getChildText("enabled")).append(OsUtils.LINE_SEPARATOR);
+        builder.append(TAB).append("Advertised: ").append(featureTypeElement.getChildText("advertised")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Namespace: ").append(featureTypeElement.getChild("namespace").getChildText("name")).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Abstract: ").append(featureTypeElement.getChildText("abstract")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Keywords: ").append(OsUtils.LINE_SEPARATOR);
         List<Element> keywordElements = featureTypeElement.getChild("keywords").getChildren("string");
         for (Element elem : keywordElements) {
@@ -130,6 +186,7 @@ public class FeatureTypeCommands implements CommandMarker {
         }
         builder.append(TAB).append("Native CRS: ").append(featureTypeElement.getChildText("nativeCRS")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("SRS: ").append(featureTypeElement.getChildText("srs")).append(OsUtils.LINE_SEPARATOR);
+        builder.append(TAB).append("Projection Policy: ").append(featureTypeElement.getChildText("projectionPolicy")).append(OsUtils.LINE_SEPARATOR);
         Element nativeBoundingBoxElement = featureTypeElement.getChild("nativeBoundingBox");
         builder.append(TAB).append("Native Bounding Box: ")
                 .append(nativeBoundingBoxElement.getChildText("minx")).append(",")
@@ -146,10 +203,13 @@ public class FeatureTypeCommands implements CommandMarker {
                 .append(latLonBoundingBoxElement.getChildText("maxy")).append(" ")
                 .append(nativeBoundingBoxElement.getChildText("crs"))
                 .append(OsUtils.LINE_SEPARATOR);
-        List<Element> metadataElements = featureTypeElement.getChild("metadata").getChildren("entry");
-        builder.append(TAB).append("Metadata: ").append(OsUtils.LINE_SEPARATOR);
-        for (Element elem : metadataElements) {
-            builder.append(TAB).append(TAB).append(elem.getAttributeValue("key")).append(" = ").append(elem.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
+        Element metadataElement = featureTypeElement.getChild("metadata");
+        if (metadataElement != null) {
+            List<Element> metadataElements = metadataElement.getChildren("entry");
+            builder.append(TAB).append("Metadata: ").append(OsUtils.LINE_SEPARATOR);
+            for (Element elem : metadataElements) {
+                builder.append(TAB).append(TAB).append(elem.getAttributeValue("key")).append(" = ").append(elem.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
+            }
         }
         builder.append(TAB).append("Store: ").append(featureTypeElement.getChild("store").getChildText("name")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Max Features: ").append(featureTypeElement.getChildText("maxFeatures")).append(OsUtils.LINE_SEPARATOR);
