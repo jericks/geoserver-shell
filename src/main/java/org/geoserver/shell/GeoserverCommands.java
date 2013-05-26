@@ -1,5 +1,6 @@
 package org.geoserver.shell;
 
+import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -14,9 +15,9 @@ public class GeoserverCommands implements CommandMarker {
 
     @CliCommand(value = "geoserver set", help = "Set the url, user, and password for Geoserver.")
     public void set(
-        @CliOption(key = {"","url"}, mandatory = true, help = "The url") String url,
-        @CliOption(key = {"user"}, mandatory = false, help = "The url", unspecifiedDefaultValue = "admin") String user,
-        @CliOption(key = {"password"}, mandatory = false, help = "The url", unspecifiedDefaultValue = "geoserver") String password
+        @CliOption(key = "url", mandatory = true, unspecifiedDefaultValue = "http://localhost:8080/geoserver", help = "The url") String url,
+        @CliOption(key = "user", mandatory = false, help = "The url", unspecifiedDefaultValue = "admin") String user,
+        @CliOption(key = "password", mandatory = false, help = "The url", unspecifiedDefaultValue = "geoserver") String password
     ) {
         geoserver.setUrl(url);
         geoserver.setUser(user);
@@ -26,5 +27,17 @@ public class GeoserverCommands implements CommandMarker {
     @CliCommand(value = "geoserver show", help = "Show the url, user, and password for Geoserver.")
     public String show() {
         return geoserver.getUrl() + " " + geoserver.getUser() + " " + geoserver.getPassword();
+    }
+
+    @CliCommand(value = "geoserver reset", help = "Reset Geoserver's configuration.")
+    public boolean reset() {
+        GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
+        return publisher.reset();
+    }
+
+    @CliCommand(value = "geoserver reload", help = "Reload Geoserver's configuration.")
+    public boolean reload() {
+        GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
+        return publisher.reload();
     }
 }
