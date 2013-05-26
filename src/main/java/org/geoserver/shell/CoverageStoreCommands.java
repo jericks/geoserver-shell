@@ -6,7 +6,9 @@ import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTCoverageStore;
 import it.geosolutions.geoserver.rest.decoder.RESTCoverageStoreList;
 import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -26,7 +28,7 @@ public class CoverageStoreCommands implements CommandMarker {
 
     @CliCommand(value = "coverage store list", help = "List coverage store.")
     public String list(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace
     ) throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTCoverageStoreList list = reader.getCoverageStores(workspace);
@@ -40,7 +42,7 @@ public class CoverageStoreCommands implements CommandMarker {
 
     @CliCommand(value = "coverage store get", help = "Get a coverage store.")
     public String get(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "coveragestore", mandatory = true, help = "The coveragestore") String coveragestore
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/coveragestores/" + coveragestore + ".xml";
@@ -49,6 +51,7 @@ public class CoverageStoreCommands implements CommandMarker {
         String name = coverageStoreElement.getChildText("name");
         String type = coverageStoreElement.getChildText("type");
         String enabled = coverageStoreElement.getChildText("enabled");
+        String covUrl = coverageStoreElement.getChildText("url");
         // @TODO RESTCoverageStore doesn't have access to type, enabled
         /*GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTCoverageStore store = reader.getCoverageStore(workspace, coveragestore);*/
@@ -56,13 +59,14 @@ public class CoverageStoreCommands implements CommandMarker {
         StringBuilder builder = new StringBuilder();
         builder.append(name).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Type: ").append(type).append(OsUtils.LINE_SEPARATOR);
+        builder.append(TAB).append("URL: ").append(covUrl).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Enabled: ").append(enabled).append(OsUtils.LINE_SEPARATOR);
         return builder.toString();
     }
 
     @CliCommand(value = "coverage store delete", help = "Delete a coverage store.")
     public boolean delete(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "coveragestore", mandatory = true, help = "The coveragestore") String coveragestore,
             @CliOption(key = "recurse", mandatory = false, help = "Whether to delete all associated layers", unspecifiedDefaultValue = "false", specifiedDefaultValue = "false") boolean recurse
     ) throws Exception {
@@ -70,44 +74,85 @@ public class CoverageStoreCommands implements CommandMarker {
         return HTTPUtils.delete(url, geoserver.getUser(), geoserver.getPassword());
     }
 
-    // @TODO Implement me
     @CliCommand(value = "coverage store modify", help = "Modify a coverage store.")
     public boolean modify(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
-            @CliOption(key = "coveragestore", mandatory = true, help = "The coveragestore") String coveragestore
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "coveragestore", mandatory = true, help = "The coveragestore") String coveragestore,
+            @CliOption(key = "name", mandatory = false, help = "The name") String name,
+            @CliOption(key = "type", mandatory = false, help = "The type") String type,
+            @CliOption(key = "url", mandatory = false, help = "The file url") String fileUrl,
+            @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/coveragestores/" + coveragestore + ".xml";
-        String content = "";
+        Document doc = new Document();
+        Element element = new Element("coverageStore");
+        doc.setRootElement(element);
+        if (name != null) element.addContent(new Element("name").setText(name));
+        if (type != null) element.addContent(new Element("type").setText(type));
+        if (fileUrl != null) element.addContent(new Element("url").setText(fileUrl));
+        element.addContent(new Element("enabled").setText(String.valueOf(enabled)));
+        element.addContent(new Element("workspace").addContent(new Element("name").setText(workspace)));
+        XMLOutputter outputter = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+        String content = outputter.outputString(doc);
         String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
         String response  = HTTPUtils.put(url, content, contentType, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
-    // @TODO Implement me
-    @CliCommand(value = "coverage store add", help = "Add a coverage store.")
-    public boolean add(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace
+    @CliCommand(value = "coverage store create", help = "Create a coverage store.")
+    public boolean create(
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "name", mandatory = true, help = "The name") String name,
+            @CliOption(key = "type", mandatory = true, help = "The type") String type,
+            @CliOption(key = "url", mandatory = true, help = "The file url") String fileUrl,
+            @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/coveragestores.xml";
-        String content = "";
+        Document doc = new Document();
+        Element element = new Element("coverageStore");
+        doc.setRootElement(element);
+        element.addContent(new Element("name").setText(name));
+        element.addContent(new Element("type").setText(type));
+        element.addContent(new Element("url").setText(fileUrl));
+        element.addContent(new Element("enabled").setText(String.valueOf(enabled)));
+        element.addContent(new Element("workspace").addContent(new Element("name").setText(workspace)));
+        XMLOutputter outputter = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+        String content = outputter.outputString(doc);
         String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
         String response  = HTTPUtils.post(url, content, contentType, geoserver.getUser(), geoserver.getPassword());
+        System.out.println(content);
+        System.out.println(url);
+        System.out.println(response);
         return response != null;
     }
 
-    // @TODO Implement me
     @CliCommand(value = "coverage store upload", help = "Upload a file to create coverage store.")
     public boolean upload(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "coveragestore", mandatory = true, help = "The coveragestore") String coveragestore,
             @CliOption(key = "file", mandatory = true, help = "The file") File file,
             @CliOption(key = "type", mandatory = true, help = "The type (geotiff, worldimage, or imagemosaic)") String type,
-            @CliOption(key = "configure", mandatory = true, help = "How to configure (first, none, all)", unspecifiedDefaultValue = "first") String configure
+            @CliOption(key = "configure", mandatory = false, help = "How to configure (first, none, all)", unspecifiedDefaultValue = "first") String configure,
+            @CliOption(key = "coverage", mandatory = false, help = "The name of the coverage") String coverageName,
+            @CliOption(key = "recalculate", mandatory = false, help = "How to recalculate bbox (nativebbox,latlonbbox)") String recalculate
     ) throws Exception {
-        ///workspaces/<ws>/coveragestores/<cs>/file[.<extension>
         String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/coveragestores/" + coveragestore + "/file." + type + "?configure=" + configure;
-        return false;
+        if (coverageName != null) {
+            url += "&coverageName=" + coverageName;
+        }
+        if (recalculate != null) {
+            url += "&recalculate=" + recalculate;
+        }
+        String contentType;
+        if (type.equalsIgnoreCase("geotiff")) {
+            contentType = "image/tiff";
+        } else if (type.equalsIgnoreCase("worldimage")) {
+            contentType = "image/" + file.getName().substring(file.getName().lastIndexOf("."));
+        } else {
+            contentType = "application/zip";
+        }
+        String response = HTTPUtils.put(url, file, contentType, geoserver.getUser(), geoserver.getPassword());
+        return response != null;
     }
-
 }
 
