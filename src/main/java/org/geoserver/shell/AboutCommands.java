@@ -55,7 +55,9 @@ public class AboutCommands implements CommandMarker {
     }
 
     @CliCommand(value = "manifest get", help = "Get a manifest.")
-    public String manifestGet(@CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name) throws Exception {
+    public String manifestGet(
+            @CliOption(key = "name", mandatory = true, help = "The name") String name
+    ) throws Exception {
         String TAB = "   ";
         String xml = HTTPUtils.get(geoserver.getUrl() + "/rest/about/manifests.xml", geoserver.getUser(), geoserver.getPassword());
         StringBuilder builder = new StringBuilder();
@@ -63,7 +65,6 @@ public class AboutCommands implements CommandMarker {
         List<Element> resources = root.getChildren("resource");
         for(Element resource : resources) {
             String n = resource.getAttributeValue("name");
-            System.out.println("Does " + name + " = " + n + "? " + name.equalsIgnoreCase(n));
             if (name.equalsIgnoreCase(n)) {
                 builder.append(name).append(OsUtils.LINE_SEPARATOR);
                 List<Element> children = resource.getChildren();
