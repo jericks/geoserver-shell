@@ -28,7 +28,7 @@ public class DataStoreCommands implements CommandMarker {
 
     @CliCommand(value = "datastore list", help = "List data stores.")
     public String list(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace
     ) throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTDataStoreList dataStores = reader.getDatastores(workspace);
@@ -42,14 +42,20 @@ public class DataStoreCommands implements CommandMarker {
 
     @CliCommand(value = "datastore create", help = "Create a new data store.")
     public boolean create(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "name", mandatory = true, help = "The name") String name,
-            @CliOption(key = "connectionParams", mandatory = true, help = "The connection parameters") String connectionParams
+            @CliOption(key = "connectionParams", mandatory = true, help = "The connection parameters") String connectionParams,
+            @CliOption(key = "description", mandatory = false, help = "The description") String description,
+            @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled
     ) throws Exception {
         Document doc = new Document();
         Element dataStoreElement = new Element("dataStore");
         doc.setRootElement(dataStoreElement);
         dataStoreElement.addContent(new Element("name").setText(name));
+        if (description != null) {
+            dataStoreElement.addContent(new Element("description").setText(description));
+        }
+        dataStoreElement.addContent(new Element("enabled").setText(String.valueOf(enabled)));
         Map<String,String> params = getParametersFromString(connectionParams);
         Element connectionParamElement = new Element("connectionParameters");
         for(Map.Entry<String,String> param : params.entrySet()) {
@@ -63,22 +69,30 @@ public class DataStoreCommands implements CommandMarker {
         return response != null;
     }
 
-    @CliCommand(value = "datastore update", help = "Create a new data store.")
-    public boolean update(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+    @CliCommand(value = "datastore modify", help = "Create a new data store.")
+    public boolean modify(
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "name", mandatory = true, help = "The name") String name,
-            @CliOption(key = "connectionParams", mandatory = true, help = "The connection parameters") String connectionParams
+            @CliOption(key = "connectionParams", mandatory = false, help = "The connection parameters") String connectionParams,
+            @CliOption(key = "description", mandatory = false, help = "The description") String description,
+            @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled
     ) throws Exception {
         Document doc = new Document();
         Element dataStoreElement = new Element("dataStore");
         doc.setRootElement(dataStoreElement);
         dataStoreElement.addContent(new Element("name").setText(name));
-        Map<String,String> params = getParametersFromString(connectionParams);
-        Element connectionParamElement = new Element("connectionParameters");
-        for(Map.Entry<String,String> param : params.entrySet()) {
-            connectionParamElement.addContent(new Element(param.getKey()).setText(param.getValue()));
+        if (description != null) {
+            dataStoreElement.addContent(new Element("description").setText(description));
         }
-        dataStoreElement.addContent(connectionParamElement);
+        dataStoreElement.addContent(new Element("enabled").setText(String.valueOf(enabled)));
+        if (connectionParams != null) {
+            Map<String,String> params = getParametersFromString(connectionParams);
+            Element connectionParamElement = new Element("connectionParameters");
+            for(Map.Entry<String,String> param : params.entrySet()) {
+                connectionParamElement.addContent(new Element(param.getKey()).setText(param.getValue()));
+            }
+            dataStoreElement.addContent(connectionParamElement);
+        }
         XMLOutputter outputter = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
         String xml = outputter.outputString(doc);
         String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/datastores/" + name + ".xml";
@@ -88,7 +102,7 @@ public class DataStoreCommands implements CommandMarker {
 
     @CliCommand(value = "datastore get", help = "Get a data store.")
     public String getSld(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "name", mandatory = true, help = "The name") String name
     ) throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
@@ -96,6 +110,7 @@ public class DataStoreCommands implements CommandMarker {
         final String TAB = "   ";
         StringBuilder builder = new StringBuilder();
         builder.append(dataStore.getName()).append(OsUtils.LINE_SEPARATOR);
+        builder.append(TAB).append("Enabled? ").append(dataStore.isEnabled()).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Description: ").append(dataStore.getDescription()).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Store Type: ").append(dataStore.getStoreType()).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Type: ").append(dataStore.getType()).append(OsUtils.LINE_SEPARATOR);
@@ -110,9 +125,9 @@ public class DataStoreCommands implements CommandMarker {
 
     @CliCommand(value = "datastore delete", help = "Delete an existing data store.")
     public boolean update(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "name", mandatory = true, help = "The name") String name,
-            @CliOption(key = "recurse", mandatory = true, help = "Whether to recursively delete all layers (true) or not (false)", unspecifiedDefaultValue = "false", specifiedDefaultValue = "false") boolean recurse
+            @CliOption(key = "recurse", mandatory = false, help = "Whether to recursively delete all layers (true) or not (false)", unspecifiedDefaultValue = "false", specifiedDefaultValue = "false") boolean recurse
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/datastores/" + name + ".xml?recurse=" + recurse;
         return HTTPUtils.delete(url, geoserver.getUser(), geoserver.getPassword());
@@ -120,7 +135,7 @@ public class DataStoreCommands implements CommandMarker {
 
     @CliCommand(value = "datastore upload", help = "Upload a File to a data store.")
     public boolean upload(
-            @CliOption(key = {"", "workspace"}, mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "name", mandatory = true, help = "The name") String name,
             @CliOption(key = "type", mandatory = true, help = "The datastore type (shp, properties, h2, spatialite)") String type,
             @CliOption(key = "file", mandatory = true, help = "The file") File file,
@@ -137,9 +152,7 @@ public class DataStoreCommands implements CommandMarker {
         if (charset != null) {
             url += "&charset=" + charset;
         }
-        System.out.println("URL: " + url);
         String response = HTTPUtils.put(url, file, "application/zip", geoserver.getUser(), geoserver.getPassword());
-        System.out.println("Response: " + response);
         return response != null;
     }
 
