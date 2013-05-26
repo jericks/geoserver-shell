@@ -4,6 +4,10 @@ import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTStyleList;
+import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -12,6 +16,8 @@ import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -23,7 +29,7 @@ public class StyleCommands implements CommandMarker {
 
     @CliCommand(value = "style list", help = "List style.")
     public String list(
-            @CliOption(key = {"", "workspace"}, mandatory = false, help = "The workspace") String workspace
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace
     ) throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTStyleList styleList = workspace != null ? this.getStyles(workspace) : reader.getStyles();
@@ -42,14 +48,31 @@ public class StyleCommands implements CommandMarker {
 
     @CliCommand(value = "style get", help = "Get the SLD of a style.")
     public String getSld(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name,
-            @CliOption(key = {"workspace"}, mandatory = false, help = "The workspace") String workspace
+            @CliOption(key = "name", mandatory = true, help = "The name") String name,
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
+            @CliOption(key = "file", mandatory = false, help = "The output file") File file,
+            @CliOption(key = "prettyprint", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether to pretty print the SLD or not") boolean prettyPrint
     ) throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
+        String sld;
         if (workspace == null) {
-            return reader.getSLD(name);
+            sld = reader.getSLD(name);
         } else {
-            return getSLD(name, workspace);
+            sld = getSLD(name, workspace);
+        }
+        if (prettyPrint) {
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(new StringReader(sld));
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+            sld = outputter.outputString(document);
+        }
+        if (file != null) {
+            FileWriter writer = new FileWriter(file);
+            writer.write(sld);
+            writer.close();
+            return file.getAbsolutePath();
+        } else {
+            return sld;
         }
     }
 
@@ -60,9 +83,9 @@ public class StyleCommands implements CommandMarker {
 
     @CliCommand(value = "style delete", help = "Delete a style.")
     public boolean delete(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name,
-            @CliOption(key = {"workspace"}, mandatory = false, help = "The workspace") String workspace,
-            @CliOption(key = {"purge"}, mandatory = false, help = "Whether to delete the SLD File from the server or not", unspecifiedDefaultValue = "false") boolean purge
+            @CliOption(key = "name", mandatory = true, help = "The name") String name,
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
+            @CliOption(key = "purge", mandatory = false, help = "Whether to delete the SLD File from the server or not", unspecifiedDefaultValue = "false") boolean purge
     ) throws Exception {
         GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         if (workspace == null) {
@@ -82,9 +105,9 @@ public class StyleCommands implements CommandMarker {
 
     @CliCommand(value = "style create", help = "Create a style.")
     public boolean create(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name,
-            @CliOption(key = {"workspace"}, mandatory = false, help = "The workspace") String workspace,
-            @CliOption(key = {"file"}, mandatory = true, help = "The SLD File") File sldFile
+            @CliOption(key = "name", mandatory = true, help = "The name") String name,
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
+            @CliOption(key = "file", mandatory = true, help = "The SLD File") File sldFile
     ) throws Exception {
         GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         if (workspace == null) {
@@ -104,11 +127,11 @@ public class StyleCommands implements CommandMarker {
         return result != null;
     }
 
-    @CliCommand(value = "style update", help = "Update a style.")
-    public boolean update(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name,
-            @CliOption(key = {"workspace"}, mandatory = false, help = "The workspace") String workspace,
-            @CliOption(key = {"file"}, mandatory = true, help = "The SLD File") File sldFile
+    @CliCommand(value = "style modify", help = "Update a style.")
+    public boolean modify(
+            @CliOption(key = "name", mandatory = true, help = "The name") String name,
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
+            @CliOption(key = "file", mandatory = true, help = "The SLD File") File sldFile
     ) throws Exception {
         GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         if (workspace == null) {
