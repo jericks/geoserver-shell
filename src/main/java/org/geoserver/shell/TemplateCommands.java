@@ -11,6 +11,7 @@ import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,8 +69,8 @@ public class TemplateCommands implements CommandMarker {
 
     @CliCommand(value = "template add", help = "Add a template.")
     public boolean add(
-        @CliOption(key = {"file"}, mandatory = true, help = "The template file") File file,
-        @CliOption(key = {"name"}, mandatory = false, help = "The name of the template") String name,
+        @CliOption(key = "file", mandatory = true, help = "The template file") File file,
+        @CliOption(key = "name", mandatory = false, help = "The name of the template") String name,
         @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
         @CliOption(key = "datastore", mandatory = false, help = "The datastore") String datastore,
         @CliOption(key = "featuretype", mandatory = false, help = "The featuretype") String featureType,
@@ -88,9 +89,9 @@ public class TemplateCommands implements CommandMarker {
     }
 
     @CliCommand(value = "template modify", help = "Modify a template.")
-    public boolean update(
-            @CliOption(key = {"name"}, mandatory = true, help = "The name of the template") String name,
-            @CliOption(key = {"file"}, mandatory = true, help = "The template file") File file,
+    public boolean modify(
+            @CliOption(key = "name", mandatory = true, help = "The name of the template") String name,
+            @CliOption(key = "file", mandatory = true, help = "The template file") File file,
             @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
             @CliOption(key = "datastore", mandatory = false, help = "The datastore") String datastore,
             @CliOption(key = "featuretype", mandatory = false, help = "The featuretype") String featureType,
@@ -110,22 +111,30 @@ public class TemplateCommands implements CommandMarker {
 
     @CliCommand(value = "template get", help = "Get a template.")
     public String get(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name of the template") String name,
+            @CliOption(key = "name", mandatory = true, help = "The name of the template") String name,
             @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
             @CliOption(key = "datastore", mandatory = false, help = "The datastore") String datastore,
             @CliOption(key = "featuretype", mandatory = false, help = "The featuretype") String featureType,
             @CliOption(key = "coveragestore", mandatory = false, help = "The coveragestore") String coverageStore,
-            @CliOption(key = "coverage", mandatory = false, help = "The coverage") String coverage
+            @CliOption(key = "coverage", mandatory = false, help = "The coverage") String coverage,
+            @CliOption(key = "file", mandatory = false, help = "The output file") File file
     ) throws Exception {
         StringBuilder urlBuilder = buildUrl(geoserver.getUrl(), workspace, datastore, featureType, coverageStore, coverage);
         urlBuilder.append("/templates/").append(name).append(name.endsWith(".ftl") ? "" : ".ftl");
         String result = HTTPUtils.get(urlBuilder.toString(), geoserver.getUser(), geoserver.getPassword());
-        return result;
+        if (file != null) {
+            FileWriter writer = new FileWriter(file);
+            writer.write(result);
+            writer.close();
+            return file.getAbsolutePath();
+        } else {
+            return result;
+        }
     }
 
     @CliCommand(value = "template delete", help = "Delete a template.")
     public boolean delete(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name of the template") String name,
+            @CliOption(key = "name", mandatory = true, help = "The name of the template") String name,
             @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
             @CliOption(key = "datastore", mandatory = false, help = "The datastore") String datastore,
             @CliOption(key = "featuretype", mandatory = false, help = "The featuretype") String featureType,
