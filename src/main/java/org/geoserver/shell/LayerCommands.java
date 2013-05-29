@@ -5,6 +5,8 @@ import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTLayer;
 import it.geosolutions.geoserver.rest.decoder.RESTLayerList;
+import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
+import org.jdom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -34,34 +36,41 @@ public class LayerCommands implements CommandMarker {
 
     @CliCommand(value = "layer get", help = "Get a layer.")
     public String get(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The layer name") String name
+            @CliOption(key = "name", mandatory = true, help = "The layer name") String name
     ) throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTLayer layer = reader.getLayer(name);
         final String TAB = "   ";
         StringBuilder builder = new StringBuilder();
-        builder.append(layer.getName()).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Title: ").append(layer.getTitle()).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Type: ").append(layer.getType()).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Abstract: ").append(layer.getAbstract()).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Default Style: ").append(layer.getDefaultStyle()).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Namespace: ").append(layer.getNameSpace()).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Resource URL: ").append(layer.getResourceUrl()).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Type String: ").append(layer.getTypeString()).append(OsUtils.LINE_SEPARATOR);
+        try {
+            builder.append(layer.getName()).append(OsUtils.LINE_SEPARATOR);
+            // @TODO RESTLayer looks at layer/resource/title instead of layer/title
+            builder.append(TAB).append("Title: ").append(layer.getTitle()).append(OsUtils.LINE_SEPARATOR);
+            builder.append(TAB).append("Type: ").append(layer.getType()).append(OsUtils.LINE_SEPARATOR);
+            builder.append(TAB).append("Abstract: ").append(layer.getAbstract()).append(OsUtils.LINE_SEPARATOR);
+            builder.append(TAB).append("Default Style: ").append(layer.getDefaultStyle()).append(OsUtils.LINE_SEPARATOR);
+            // @TODO RESTLayer can't access <styles>
+            // @TODO RESTLayer can throw Exception where there is no namespace
+            // builder.append(TAB).append("Namespace: ").append(layer.getNameSpace()).append(OsUtils.LINE_SEPARATOR);
+            builder.append(TAB).append("Type String: ").append(layer.getTypeString()).append(OsUtils.LINE_SEPARATOR);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         return builder.toString();
     }
 
     @CliCommand(value = "layer modify", help = "Modify a layer.")
-    public void modify(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The layer name") String name,
+    public boolean modify(
+            @CliOption(key = "name", mandatory = true, help = "The layer name") String name,
             @CliOption(key = "title", mandatory = false, help = "The new title") String title,
             @CliOption(key = "abstract", mandatory = false, help = "The new abstract") String abstractStr,
             @CliOption(key = "defaultStyle", mandatory = false, help = "The new default style") String defaultStyle,
             @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", specifiedDefaultValue = "true", help = "Whether the layer is enabled or not") boolean enabled
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/layers/" + name + ".xml";
+        String url = geoserver.getUrl() + "/rest/layers/" + URLUtil.encode(name) + ".xml";
         StringBuilder builder = new StringBuilder();
         builder.append("<layer>");
+        builder.append("<name>").append(name).append("</name>");
         if (title != null) {
             builder.append("<title>").append(title).append("</title>");
         }
@@ -75,16 +84,42 @@ public class LayerCommands implements CommandMarker {
         builder.append("</layer>");
         String content = builder.toString();
         String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        HTTPUtils.put(url, content, contentType, geoserver.getUser(), geoserver.getPassword());
+        String response = HTTPUtils.put(url, content, contentType, geoserver.getUser(), geoserver.getPassword());
+        return response != null;
     }
 
     @CliCommand(value = "layer remove", help = "Remove a layer.")
     public boolean delete(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name,
+            @CliOption(key = "name", mandatory = true, help = "The name") String name,
             @CliOption(key = "recurse", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "false", help = "Whether to delete associated styles") boolean recurse
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/layers/" + name + ".xml?recurse=" + recurse;
+        String url = geoserver.getUrl() + "/rest/layers/" + URLUtil.encode(name) + ".xml?recurse=" + recurse;
         return HTTPUtils.delete(url, geoserver.getUser(), geoserver.getPassword());
     }
 
+    @CliCommand(value = "layer style list", help = "List the Styles for a layer.")
+    public String listStyles(
+            @CliOption(key = "name", mandatory = true, help = "The name") String name
+    ) throws Exception {
+        String url = geoserver.getUrl() + "/rest/layers/" + URLUtil.encode(name) + "/styles.xml";
+        String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
+        Element element = JDOMBuilder.buildElement(xml);
+        List<Element> styleElements = element.getChildren("style");
+        StringBuilder builder = new StringBuilder();
+        for(Element styleElement: styleElements) {
+            builder.append(styleElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+        }
+        return builder.toString();
+    }
+
+    @CliCommand(value = "layer style add", help = "Add a Style to a layer.")
+    public boolean addStyle(
+            @CliOption(key = "name", mandatory = true, help = "The name") String name,
+            @CliOption(key = "style", mandatory = true, help = "The style") String style
+    ) throws Exception {
+        String url = geoserver.getUrl() + "/rest/layers/" + URLUtil.encode(name) + "/styles.xml";
+        String xml = "<style><name>" + style + "</name></style>";
+        String response = HTTPUtils.post(url, xml, GeoServerRESTPublisher.Format.XML.getContentType(), geoserver.getUser(), geoserver.getPassword());
+        return response != null;
+    }
 }
