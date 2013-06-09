@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.StringReader;
-import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -34,15 +34,16 @@ public class StyleCommands implements CommandMarker {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTStyleList styleList = workspace != null ? this.getStyles(workspace) : reader.getStyles();
         List<String> names = styleList.getNames();
+        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
-        for(String name : names) {
+        for (String name : names) {
             builder.append(name + OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
     }
 
     private RESTStyleList getStyles(String workspace) throws Exception {
-        String url = "/rest/workspaces/" + workspace + "/styles.xml";
+        String url = "/rest/workspaces/" + URLUtil.encode(workspace) + "/styles.xml";
         return RESTStyleList.build(HTTPUtils.get(geoserver.getUrl() + url, geoserver.getUser(), geoserver.getPassword()));
     }
 
@@ -77,7 +78,7 @@ public class StyleCommands implements CommandMarker {
     }
 
     private String getSLD(String name, String workspace) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/styles/" + name + ".sld";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/styles/" + URLUtil.encode(name) + ".sld";
         return HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
     }
 
@@ -96,7 +97,7 @@ public class StyleCommands implements CommandMarker {
     }
 
     private boolean removeStyle(String name, String workspace, boolean purge) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/styles/" + URLEncoder.encode(name);
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/styles/" + URLUtil.encode(name);
         if (purge) {
             url += "?purge=true";
         }
@@ -118,11 +119,10 @@ public class StyleCommands implements CommandMarker {
     }
 
     public boolean publishStyle(File sldFile, String name, String workspace) {
-        String sUrl = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/styles";
+        String sUrl = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/styles";
         if (name != null && !name.isEmpty()) {
-            sUrl += "?name=" + URLEncoder.encode(name);
+            sUrl += "?name=" + URLUtil.encode(name);
         }
-        System.out.println(sUrl);
         String result = HTTPUtils.post(sUrl, sldFile, "application/vnd.ogc.sld+xml", geoserver.getUser(), geoserver.getPassword());
         return result != null;
     }
@@ -142,9 +142,8 @@ public class StyleCommands implements CommandMarker {
     }
 
     private boolean updateStyle(File sldFile, String name, String workspace) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/styles/" + URLEncoder.encode(name);
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/styles/" + URLUtil.encode(name);
         final String result = HTTPUtils.put(url, sldFile, "application/vnd.ogc.sld+xml", geoserver.getUser(), geoserver.getPassword());
         return result != null;
     }
-
 }

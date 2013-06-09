@@ -1,8 +1,5 @@
 package org.geoserver.shell;
 
-/**
- *
- */
 public class Geoserver {
 
     private String url;

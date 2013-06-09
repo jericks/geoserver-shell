@@ -26,7 +26,7 @@ public class AboutCommands implements CommandMarker {
         Element root = JDOMBuilder.buildElement(xml);
 
         List<Element> resources = root.getChildren("resource");
-        for(Element resource : resources) {
+        for (Element resource : resources) {
             String name = resource.getAttributeValue("name");
             String buildTime = resource.getChildText("Build-Timestamp");
             String gitRevision = resource.getChildText("Git-Revision");
@@ -47,7 +47,7 @@ public class AboutCommands implements CommandMarker {
         StringBuilder builder = new StringBuilder();
         Element root = JDOMBuilder.buildElement(xml);
         List<Element> resources = root.getChildren("resource");
-        for(Element resource : resources) {
+        for (Element resource : resources) {
             String name = resource.getAttributeValue("name");
             builder.append(name).append(OsUtils.LINE_SEPARATOR);
         }
@@ -63,12 +63,12 @@ public class AboutCommands implements CommandMarker {
         StringBuilder builder = new StringBuilder();
         Element root = JDOMBuilder.buildElement(xml);
         List<Element> resources = root.getChildren("resource");
-        for(Element resource : resources) {
+        for (Element resource : resources) {
             String n = resource.getAttributeValue("name");
             if (name.equalsIgnoreCase(n)) {
                 builder.append(name).append(OsUtils.LINE_SEPARATOR);
                 List<Element> children = resource.getChildren();
-                for(Element child : children) {
+                for (Element child : children) {
                     builder.append(TAB).append(child.getName()).append(": ").append(child.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
                 }
             }

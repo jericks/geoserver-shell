@@ -4,13 +4,8 @@ import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTNamespace;
-import it.geosolutions.geoserver.rest.decoder.RESTWorkspaceList;
 import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
-import it.geosolutions.geoserver.rest.encoder.GSNamespaceEncoder;
-import it.geosolutions.geoserver.rest.encoder.GSWorkspaceEncoder;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -18,8 +13,8 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.StringReader;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -32,8 +27,9 @@ public class NamespaceCommands implements CommandMarker {
     public String list() throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         List<String> names = reader.getNamespaceNames();
+        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
-        for(String name : names) {
+        for (String name : names) {
             builder.append(name + OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
@@ -87,7 +83,7 @@ public class NamespaceCommands implements CommandMarker {
     @CliCommand(value = "namespace default set", help = "Set the default namespace.")
     public boolean setDefault(
             @CliOption(key = "prefix", mandatory = true, help = "The prefix") String prefix) throws Exception {
-        String content = "<namespace><prefix>"+prefix+"</prefix></namespace>";
+        String content = "<namespace><prefix>" + prefix + "</prefix></namespace>";
         String result = HTTPUtils.putXml(geoserver.getUrl() + "/rest/namespaces/default.xml", content, geoserver.getUser(), geoserver.getPassword());
         return result != null;
     }

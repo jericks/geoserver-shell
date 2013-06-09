@@ -3,17 +3,12 @@ package org.geoserver.shell;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
-
-import java.io.StringReader;
 
 @Component
 public class SettingsCommands implements CommandMarker {
@@ -142,89 +137,89 @@ public class SettingsCommands implements CommandMarker {
         // Contacts
         Element contactElement = settingsElement.getChild("contact");
         if (person != null) {
-            JDOMUtil.getOrAdd(contactElement,"contactPerson").setText(person);
+            JDOMUtil.getOrAdd(contactElement, "contactPerson").setText(person);
         }
         if (position != null) {
-            JDOMUtil.getOrAdd(contactElement,"contactPosition").setText(position);
+            JDOMUtil.getOrAdd(contactElement, "contactPosition").setText(position);
         }
         if (email != null) {
-            JDOMUtil.getOrAdd(contactElement,"contactEmail").setText(email);
+            JDOMUtil.getOrAdd(contactElement, "contactEmail").setText(email);
         }
         if (organization != null) {
-            JDOMUtil.getOrAdd(contactElement,"contactOrganization").setText(organization);
+            JDOMUtil.getOrAdd(contactElement, "contactOrganization").setText(organization);
         }
         if (city != null) {
-            JDOMUtil.getOrAdd(contactElement,"addressCity").setText(city);
+            JDOMUtil.getOrAdd(contactElement, "addressCity").setText(city);
         }
         if (country != null) {
-            JDOMUtil.getOrAdd(contactElement,"addressCountry").setText(country);
+            JDOMUtil.getOrAdd(contactElement, "addressCountry").setText(country);
         }
         if (addressType != null) {
-            JDOMUtil.getOrAdd(contactElement,"addressType").setText(addressType);
+            JDOMUtil.getOrAdd(contactElement, "addressType").setText(addressType);
         }
         // JAI
         Element jaiElement = element.getChild("jai");
         if (allowInterpolation != null) {
-            JDOMUtil.getOrAdd(jaiElement,"allowInterpolation").setText(allowInterpolation);
+            JDOMUtil.getOrAdd(jaiElement, "allowInterpolation").setText(allowInterpolation);
         }
         if (recycling != null) {
-            JDOMUtil.getOrAdd(jaiElement,"recycling").setText(recycling);
+            JDOMUtil.getOrAdd(jaiElement, "recycling").setText(recycling);
         }
         if (tilePriority != null) {
-            JDOMUtil.getOrAdd(jaiElement,"tilePriority").setText(tilePriority);
+            JDOMUtil.getOrAdd(jaiElement, "tilePriority").setText(tilePriority);
         }
         if (tileThreads != null) {
-            JDOMUtil.getOrAdd(jaiElement,"tileThreads").setText(tileThreads);
+            JDOMUtil.getOrAdd(jaiElement, "tileThreads").setText(tileThreads);
         }
         if (memoryCapacity != null) {
-            JDOMUtil.getOrAdd(jaiElement,"memoryCapacity").setText(memoryCapacity);
+            JDOMUtil.getOrAdd(jaiElement, "memoryCapacity").setText(memoryCapacity);
         }
         if (memoryThreshold != null) {
-            JDOMUtil.getOrAdd(jaiElement,"memoryThreshold").setText(memoryThreshold);
+            JDOMUtil.getOrAdd(jaiElement, "memoryThreshold").setText(memoryThreshold);
         }
         if (imageIOCache != null) {
-            JDOMUtil.getOrAdd(jaiElement,"imageIOCache").setText(imageIOCache);
+            JDOMUtil.getOrAdd(jaiElement, "imageIOCache").setText(imageIOCache);
         }
         if (pngAcceleration != null) {
-            JDOMUtil.getOrAdd(jaiElement,"pngAcceleration").setText(pngAcceleration);
+            JDOMUtil.getOrAdd(jaiElement, "pngAcceleration").setText(pngAcceleration);
         }
         if (jpegAcceleration != null) {
-            JDOMUtil.getOrAdd(jaiElement,"jpegAcceleration").setText(jpegAcceleration);
+            JDOMUtil.getOrAdd(jaiElement, "jpegAcceleration").setText(jpegAcceleration);
         }
         if (allowNativeMosaic != null) {
-            JDOMUtil.getOrAdd(jaiElement,"allowNativeMosaic").setText(allowNativeMosaic);
+            JDOMUtil.getOrAdd(jaiElement, "allowNativeMosaic").setText(allowNativeMosaic);
         }
         // Coverage Access
         Element coverageAccessElement = element.getChild("coverageAccess");
         if (maxPoolSize != null) {
-            JDOMUtil.getOrAdd(coverageAccessElement,"maxPoolSize").setText(maxPoolSize);
+            JDOMUtil.getOrAdd(coverageAccessElement, "maxPoolSize").setText(maxPoolSize);
         }
         if (corePoolSize != null) {
-            JDOMUtil.getOrAdd(coverageAccessElement,"corePoolSize").setText(corePoolSize);
+            JDOMUtil.getOrAdd(coverageAccessElement, "corePoolSize").setText(corePoolSize);
         }
         if (keepAliveTime != null) {
-            JDOMUtil.getOrAdd(coverageAccessElement,"keepAliveTime").setText(keepAliveTime);
+            JDOMUtil.getOrAdd(coverageAccessElement, "keepAliveTime").setText(keepAliveTime);
         }
         if (queueType != null) {
-            JDOMUtil.getOrAdd(coverageAccessElement,"queueType").setText(queueType);
+            JDOMUtil.getOrAdd(coverageAccessElement, "queueType").setText(queueType);
         }
         if (imageIOCacheThreshold != null) {
-            JDOMUtil.getOrAdd(coverageAccessElement,"imageIOCacheThreshold").setText(imageIOCacheThreshold);
+            JDOMUtil.getOrAdd(coverageAccessElement, "imageIOCacheThreshold").setText(imageIOCacheThreshold);
         }
         // Global
         if (updateSequence != null) {
-            JDOMUtil.getOrAdd(element,"updateSequence").setText(updateSequence);
+            JDOMUtil.getOrAdd(element, "updateSequence").setText(updateSequence);
         }
         if (featureTypeCacheSize != null) {
-            JDOMUtil.getOrAdd(element,"featureTypeCacheSize").setText(featureTypeCacheSize);
+            JDOMUtil.getOrAdd(element, "featureTypeCacheSize").setText(featureTypeCacheSize);
         }
         if (globalServices != null) {
-            JDOMUtil.getOrAdd(element,"globalServices").setText(globalServices);
+            JDOMUtil.getOrAdd(element, "globalServices").setText(globalServices);
         }
         if (xmlPostRequestLogBufferSize != null) {
-            JDOMUtil.getOrAdd(element,"xmlPostRequestLogBufferSize").setText(xmlPostRequestLogBufferSize);
+            JDOMUtil.getOrAdd(element, "xmlPostRequestLogBufferSize").setText(xmlPostRequestLogBufferSize);
         }
-        String content = new XMLOutputter(Format.getPrettyFormat()).outputString(element);
+        String content = JDOMUtil.toString(element);
         String response = HTTPUtils.putXml(url, content, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
@@ -278,7 +273,7 @@ public class SettingsCommands implements CommandMarker {
         if (addressType != null) {
             element.addContent(new Element("addressType").setText(addressType));
         }
-        String content = new XMLOutputter(Format.getPrettyFormat()).outputString(element);
+        String content = JDOMUtil.toString(element);
         String response = HTTPUtils.putXml(url, content, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
@@ -352,7 +347,7 @@ public class SettingsCommands implements CommandMarker {
             JDOMUtil.getOrAdd(settingsElement, "verboseExceptions").setText(verboseExceptions);
         }
         // Contact
-        Element contactElement = JDOMUtil.getOrAdd(settingsElement,"contact");
+        Element contactElement = JDOMUtil.getOrAdd(settingsElement, "contact");
         if (person != null) {
             JDOMUtil.getOrAdd(contactElement, "contactPerson").setText(person);
         }
@@ -374,11 +369,8 @@ public class SettingsCommands implements CommandMarker {
         if (addressType != null) {
             JDOMUtil.getOrAdd(contactElement, "addressType").setText(addressType);
         }
-        String xml = new XMLOutputter(Format.getPrettyFormat()).outputString(settingsElement);
+        String xml = JDOMUtil.toString(settingsElement);
         String response = HTTPUtils.putXml(url, xml, geoserver.getUser(), geoserver.getPassword());
-        System.out.println(url);
-        System.out.println(xml);
-        System.out.println(response);
         return response != null;
     }
 
@@ -416,7 +408,7 @@ public class SettingsCommands implements CommandMarker {
             JDOMUtil.getOrAdd(settingsElement, "verboseExceptions").setText(verboseExceptions);
         }
         // Contact
-        Element contactElement = JDOMUtil.getOrAdd(settingsElement,"contact");
+        Element contactElement = JDOMUtil.getOrAdd(settingsElement, "contact");
         if (person != null) {
             JDOMUtil.getOrAdd(contactElement, "contactPerson").setText(person);
         }
@@ -438,11 +430,8 @@ public class SettingsCommands implements CommandMarker {
         if (addressType != null) {
             JDOMUtil.getOrAdd(contactElement, "addressType").setText(addressType);
         }
-        String xml = new XMLOutputter(Format.getPrettyFormat()).outputString(settingsElement);
+        String xml = JDOMUtil.toString(settingsElement);
         String response = HTTPUtils.putXml(url, xml, geoserver.getUser(), geoserver.getPassword());
-        System.out.println(url);
-        System.out.println(xml);
-        System.out.println(response);
         return response != null;
     }
 

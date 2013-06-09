@@ -1,13 +1,10 @@
 package org.geoserver.shell;
 
-import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import org.geotools.data.DataUtilities;
 import org.geotools.referencing.CRS;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +15,7 @@ import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -39,6 +37,7 @@ public class FeatureTypeCommands implements CommandMarker {
         for (Element elem : elements) {
             names.add(elem.getChildText("name"));
         }
+        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
         for (String name : names) {
             builder.append(name + OsUtils.LINE_SEPARATOR);
@@ -64,9 +63,7 @@ public class FeatureTypeCommands implements CommandMarker {
             @CliOption(key = "list", mandatory = false, help = "Determines which feature types are returned (configured, available, available_with_geom, all)", unspecifiedDefaultValue = "configured", specifiedDefaultValue = "configured") String list
     ) throws Exception {
         SimpleFeatureType featureType = DataUtilities.createType(featuretype, schema);
-        Document document = new Document();
         Element rootElement = new Element("featureType");
-        document.setRootElement(rootElement);
         rootElement.addContent(new Element("name").setText(featuretype));
         Element attributesElement = new Element("attributes");
         rootElement.addContent(attributesElement);
@@ -89,7 +86,7 @@ public class FeatureTypeCommands implements CommandMarker {
         if (keywords != null) {
             Element keywordsElement = new Element("keywords");
             String[] keys = keywords.split(",");
-            for(String key : keys) {
+            for (String key : keys) {
                 keywordsElement.addContent(new Element("keyword").setText(key));
             }
             rootElement.addContent(keywordsElement);
@@ -99,10 +96,9 @@ public class FeatureTypeCommands implements CommandMarker {
         rootElement.addContent(new Element("advertised").setText(String.valueOf(advertised)));
         rootElement.addContent(new Element("maxFeatures").setText(String.valueOf(maxFeatures)));
         rootElement.addContent(new Element("numDecimals").setText(String.valueOf(numDecimals)));
-        XMLOutputter outputter = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-        String xml = outputter.outputString(document);
+        String xml = JDOMUtil.toString(rootElement);
         String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes.xml";
-        String response = HTTPUtils.post(url, xml, GeoServerRESTPublisher.Format.XML.getContentType(), geoserver.getUser(), geoserver.getPassword());
+        String response = HTTPUtils.postXml(url, xml, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -117,10 +113,10 @@ public class FeatureTypeCommands implements CommandMarker {
             @CliOption(key = "keywords", mandatory = false, help = "The comma delimited list of keywords") String keywords,
             @CliOption(key = "srs", mandatory = false, help = "The SRS") String srs,
             @CliOption(key = "projectionpolicy", mandatory = false, help = "The projection policy") String projectionPolicy,
-            @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled,
-            @CliOption(key = "advertised", mandatory = false, unspecifiedDefaultValue = "true", help = "The advertised flag") boolean advertised,
-            @CliOption(key = "maxfeatures", mandatory = false, unspecifiedDefaultValue = "0", help = "The max number of features") int maxFeatures,
-            @CliOption(key = "numdecimals", mandatory = false, unspecifiedDefaultValue = "0", help = "The number of decimals") int numDecimals,
+            @CliOption(key = "enabled", mandatory = false, help = "The enabled flag") String enabled,
+            @CliOption(key = "advertised", mandatory = false, help = "The advertised flag") String advertised,
+            @CliOption(key = "maxfeatures", mandatory = false, help = "The max number of features") String maxFeatures,
+            @CliOption(key = "numdecimals", mandatory = false, help = "The number of decimals") String numDecimals,
             @CliOption(key = "recalculate", mandatory = false, help = "Recalculate bounding boxes: nativebbox,latlonbbox", unspecifiedDefaultValue = "") String recalculate
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes/" + URLUtil.encode(featuretype) + ".xml?recalculate=" + recalculate;
@@ -132,21 +128,21 @@ public class FeatureTypeCommands implements CommandMarker {
         if (keywords != null) {
             xmlBuilder.append("<keywords>");
             String[] keys = keywords.split(",");
-            for(String key : keys) {
+            for (String key : keys) {
                 xmlBuilder.append("<keyword>").append(key).append("</keyword>");
             }
             xmlBuilder.append("</keywords>");
         }
         if (srs != null) xmlBuilder.append("<srs>").append(srs).append("</srs>");
-        if (projectionPolicy != null) xmlBuilder.append("<projectionPolicy>").append(projectionPolicy).append("</projectionPolicy>");
-        xmlBuilder.append("<enabled>").append(enabled).append("</enabled>");
-        xmlBuilder.append("<advertised>").append(advertised).append("</advertised>");
-        xmlBuilder.append("<maxFeatures>").append(maxFeatures).append("</maxFeatures>");
-        xmlBuilder.append("<numDecimals>").append(numDecimals).append("</numDecimals>");
+        if (projectionPolicy != null)
+            xmlBuilder.append("<projectionPolicy>").append(projectionPolicy).append("</projectionPolicy>");
+        if (enabled != null) xmlBuilder.append("<enabled>").append(enabled).append("</enabled>");
+        if (advertised != null) xmlBuilder.append("<advertised>").append(advertised).append("</advertised>");
+        if (maxFeatures != null) xmlBuilder.append("<maxFeatures>").append(maxFeatures).append("</maxFeatures>");
+        if (numDecimals != null) xmlBuilder.append("<numDecimals>").append(numDecimals).append("</numDecimals>");
         xmlBuilder.append("</featureType>");
         String content = xmlBuilder.toString();
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response = HTTPUtils.put(url, content, contentType, geoserver.getUser(), geoserver.getPassword());
+        String response = HTTPUtils.putXml(url, content, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 

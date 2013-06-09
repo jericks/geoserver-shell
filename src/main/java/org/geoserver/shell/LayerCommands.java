@@ -1,6 +1,5 @@
 package org.geoserver.shell;
 
-import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTLayer;
@@ -14,6 +13,7 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -27,8 +27,9 @@ public class LayerCommands implements CommandMarker {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTLayerList layers = reader.getLayers();
         List<String> names = layers.getNames();
+        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
-        for(String name : names) {
+        for (String name : names) {
             builder.append(name + OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
@@ -51,7 +52,11 @@ public class LayerCommands implements CommandMarker {
             builder.append(TAB).append("Default Style: ").append(layer.getDefaultStyle()).append(OsUtils.LINE_SEPARATOR);
             // @TODO RESTLayer can't access <styles>
             // @TODO RESTLayer can throw Exception where there is no namespace
-            // builder.append(TAB).append("Namespace: ").append(layer.getNameSpace()).append(OsUtils.LINE_SEPARATOR);
+            try {
+                builder.append(TAB).append("Namespace: ").append(layer.getNameSpace()).append(OsUtils.LINE_SEPARATOR);
+            } catch (Exception ex) {
+                // Do nothing
+            }
             builder.append(TAB).append("Type String: ").append(layer.getTypeString()).append(OsUtils.LINE_SEPARATOR);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -65,7 +70,7 @@ public class LayerCommands implements CommandMarker {
             @CliOption(key = "title", mandatory = false, help = "The new title") String title,
             @CliOption(key = "abstract", mandatory = false, help = "The new abstract") String abstractStr,
             @CliOption(key = "defaultStyle", mandatory = false, help = "The new default style") String defaultStyle,
-            @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", specifiedDefaultValue = "true", help = "Whether the layer is enabled or not") boolean enabled
+            @CliOption(key = "enabled", mandatory = false, help = "Whether the layer is enabled or not") String enabled
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/layers/" + URLUtil.encode(name) + ".xml";
         StringBuilder builder = new StringBuilder();
@@ -80,11 +85,12 @@ public class LayerCommands implements CommandMarker {
         if (defaultStyle != null) {
             builder.append("<defaultStyle><name>").append(defaultStyle).append("</name></defaultStyle>");
         }
-        builder.append("<enabled>").append(enabled).append("</enabled>");
+        if (enabled != null) {
+            builder.append("<enabled>").append(enabled).append("</enabled>");
+        }
         builder.append("</layer>");
         String content = builder.toString();
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response = HTTPUtils.put(url, content, contentType, geoserver.getUser(), geoserver.getPassword());
+        String response = HTTPUtils.putXml(url, content, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -106,7 +112,7 @@ public class LayerCommands implements CommandMarker {
         Element element = JDOMBuilder.buildElement(xml);
         List<Element> styleElements = element.getChildren("style");
         StringBuilder builder = new StringBuilder();
-        for(Element styleElement: styleElements) {
+        for (Element styleElement : styleElements) {
             builder.append(styleElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
@@ -119,7 +125,7 @@ public class LayerCommands implements CommandMarker {
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/layers/" + URLUtil.encode(name) + "/styles.xml";
         String xml = "<style><name>" + style + "</name></style>";
-        String response = HTTPUtils.post(url, xml, GeoServerRESTPublisher.Format.XML.getContentType(), geoserver.getUser(), geoserver.getPassword());
+        String response = HTTPUtils.postXml(url, xml, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 }

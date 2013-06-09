@@ -3,10 +3,12 @@ package org.geoserver.shell;
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
-import it.geosolutions.geoserver.rest.decoder.*;
+import it.geosolutions.geoserver.rest.decoder.RESTCoverage;
+import it.geosolutions.geoserver.rest.decoder.RESTCoverageList;
+import it.geosolutions.geoserver.rest.decoder.RESTDimensionInfo;
+import it.geosolutions.geoserver.rest.decoder.RESTMetadataList;
 import it.geosolutions.geoserver.rest.encoder.coverage.GSCoverageEncoder;
 import it.geosolutions.geoserver.rest.encoder.feature.FeatureTypeAttribute;
-import it.geosolutions.geoserver.rest.encoder.feature.GSAttributeEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -14,6 +16,7 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +34,9 @@ public class CoverageCommands implements CommandMarker {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTCoverageList list = reader.getCoverages(workspace, coveragestore);
         List<String> names = list.getNames();
+        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
-        for(String name : names) {
+        for (String name : names) {
             builder.append(name).append(OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
@@ -60,7 +64,7 @@ public class CoverageCommands implements CommandMarker {
         builder.append(TAB).append("Native CRS: ").append(cov.getNativeCRS()).append(OsUtils.LINE_SEPARATOR);
         try {
             builder.append(TAB).append("Dimension Info: ").append(OsUtils.LINE_SEPARATOR);
-            for(RESTDimensionInfo info : cov.getDimensionInfo()) {
+            for (RESTDimensionInfo info : cov.getDimensionInfo()) {
                 String key = info.getKey();
                 String presentation = info.getPresentation();
                 String resolution = info.getResolution();
@@ -68,32 +72,29 @@ public class CoverageCommands implements CommandMarker {
                 builder.append(TAB).append(TAB).append(TAB).append(presentation).append(OsUtils.LINE_SEPARATOR);
                 builder.append(TAB).append(TAB).append(TAB).append(resolution).append(OsUtils.LINE_SEPARATOR);
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // @TODO Fix RESTCoverage so it doesn't throw an exception if no XML element exists
         }
         try {
             builder.append(TAB).append("Metadata List: ").append(OsUtils.LINE_SEPARATOR);
             RESTMetadataList metadataList = cov.getMetadataList();
-            for(int i=0; i<metadataList.size(); i++) {
+            for (int i = 0; i < metadataList.size(); i++) {
                 RESTMetadataList.RESTMetadataElement elem = metadataList.get(i);
                 String key = elem.getKey();
                 String value = elem.getMetadataElem().getTextTrim();
                 builder.append(TAB).append(TAB).append(key).append(": ").append(value).append(OsUtils.LINE_SEPARATOR);
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // @TODO Fix RESTCoverage so it doesn't throw an exception if no XML element exists
         }
         try {
             builder.append(TAB).append("Attribute List: ").append(OsUtils.LINE_SEPARATOR);
-            for(Map<FeatureTypeAttribute, String> attributes : cov.getAttributeList()) {
-                for(Map.Entry<FeatureTypeAttribute, String> attr: attributes.entrySet()) {
+            for (Map<FeatureTypeAttribute, String> attributes : cov.getAttributeList()) {
+                for (Map.Entry<FeatureTypeAttribute, String> attr : attributes.entrySet()) {
                     builder.append(TAB).append(TAB).append(attr.getKey()).append(": ").append(attr.getValue()).append(OsUtils.LINE_SEPARATOR);
                 }
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // @TODO Fix RESTCoverage so it doesn't throw an exception if no XML element exists
         }
         return builder.toString();
@@ -116,7 +117,7 @@ public class CoverageCommands implements CommandMarker {
         coverageEncoder.setEnabled(enabled);
         if (keywords != null) {
             String[] keys = keywords.split(",");
-            for(String key: keys) {
+            for (String key : keys) {
                 coverageEncoder.addKeyword(key);
             }
         }
@@ -135,15 +136,15 @@ public class CoverageCommands implements CommandMarker {
             @CliOption(key = "description", mandatory = false, help = "The description") String description,
             @CliOption(key = "keywords", mandatory = false, help = "The keywords") String keywords,
             @CliOption(key = "srs", mandatory = false, help = "The srs") String srs,
-            @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled
+            @CliOption(key = "enabled", mandatory = false, help = "The enabled flag") String enabled
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/coveragestores/" + URLUtil.encode(coveragestore) + "/coverages/" + URLUtil.encode(coverage) + ".xml";
         GSCoverageEncoder coverageEncoder = new GSCoverageEncoder();
         coverageEncoder.setName(coverage);
-        coverageEncoder.setEnabled(enabled);
+        if (enabled != null) coverageEncoder.setEnabled(Boolean.valueOf(enabled));
         if (keywords != null) {
             String[] keys = keywords.split(",");
-            for(String key: keys) {
+            for (String key : keys) {
                 coverageEncoder.addKeyword(key);
             }
         }
@@ -151,8 +152,7 @@ public class CoverageCommands implements CommandMarker {
         if (description != null) coverageEncoder.setDescription(title);
         if (srs != null) coverageEncoder.setSRS(srs);
         String content = coverageEncoder.toString();
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response = HTTPUtils.put(url, content, contentType, geoserver.getUser(), geoserver.getPassword());
+        String response = HTTPUtils.putXml(url, content, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 

@@ -1,14 +1,10 @@
 package org.geoserver.shell;
 
-import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
-import it.geosolutions.geoserver.rest.decoder.RESTCoverageStore;
 import it.geosolutions.geoserver.rest.decoder.RESTCoverageStoreList;
 import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -17,7 +13,7 @@ import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -33,8 +29,9 @@ public class CoverageStoreCommands implements CommandMarker {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTCoverageStoreList list = reader.getCoverageStores(workspace);
         List<String> names = list.getNames();
+        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
-        for(String name : names) {
+        for (String name : names) {
             builder.append(name).append(OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
@@ -45,7 +42,7 @@ public class CoverageStoreCommands implements CommandMarker {
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "coveragestore", mandatory = true, help = "The coveragestore") String coveragestore
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/coveragestores/" + coveragestore + ".xml";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/coveragestores/" + URLUtil.encode(coveragestore) + ".xml";
         String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         Element coverageStoreElement = JDOMBuilder.buildElement(xml);
         String name = coverageStoreElement.getChildText("name");
@@ -70,7 +67,7 @@ public class CoverageStoreCommands implements CommandMarker {
             @CliOption(key = "coveragestore", mandatory = true, help = "The coveragestore") String coveragestore,
             @CliOption(key = "recurse", mandatory = false, help = "Whether to delete all associated layers", unspecifiedDefaultValue = "false", specifiedDefaultValue = "false") boolean recurse
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/coveragestores/" + coveragestore + ".xml?recurse=" + recurse;
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/coveragestores/" + URLUtil.encode(coveragestore) + ".xml?recurse=" + recurse;
         return HTTPUtils.delete(url, geoserver.getUser(), geoserver.getPassword());
     }
 
@@ -81,21 +78,17 @@ public class CoverageStoreCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = false, help = "The name") String name,
             @CliOption(key = "type", mandatory = false, help = "The type") String type,
             @CliOption(key = "url", mandatory = false, help = "The file url") String fileUrl,
-            @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled
+            @CliOption(key = "enabled", mandatory = false, help = "The enabled flag") String enabled
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/coveragestores/" + coveragestore + ".xml";
-        Document doc = new Document();
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/coveragestores/" + URLUtil.encode(coveragestore) + ".xml";
         Element element = new Element("coverageStore");
-        doc.setRootElement(element);
         if (name != null) element.addContent(new Element("name").setText(name));
         if (type != null) element.addContent(new Element("type").setText(type));
         if (fileUrl != null) element.addContent(new Element("url").setText(fileUrl));
-        element.addContent(new Element("enabled").setText(String.valueOf(enabled)));
+        if (enabled != null) element.addContent(new Element("enabled").setText(enabled));
         element.addContent(new Element("workspace").addContent(new Element("name").setText(workspace)));
-        XMLOutputter outputter = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-        String content = outputter.outputString(doc);
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response  = HTTPUtils.put(url, content, contentType, geoserver.getUser(), geoserver.getPassword());
+        String content = JDOMUtil.toString(element);
+        String response = HTTPUtils.putXml(url, content, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -107,22 +100,15 @@ public class CoverageStoreCommands implements CommandMarker {
             @CliOption(key = "url", mandatory = true, help = "The file url") String fileUrl,
             @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/coveragestores.xml";
-        Document doc = new Document();
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/coveragestores.xml";
         Element element = new Element("coverageStore");
-        doc.setRootElement(element);
         element.addContent(new Element("name").setText(name));
         element.addContent(new Element("type").setText(type));
         element.addContent(new Element("url").setText(fileUrl));
         element.addContent(new Element("enabled").setText(String.valueOf(enabled)));
         element.addContent(new Element("workspace").addContent(new Element("name").setText(workspace)));
-        XMLOutputter outputter = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-        String content = outputter.outputString(doc);
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response  = HTTPUtils.post(url, content, contentType, geoserver.getUser(), geoserver.getPassword());
-        System.out.println(content);
-        System.out.println(url);
-        System.out.println(response);
+        String content = JDOMUtil.toString(element);
+        String response = HTTPUtils.postXml(url, content, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -136,7 +122,7 @@ public class CoverageStoreCommands implements CommandMarker {
             @CliOption(key = "coverage", mandatory = false, help = "The name of the coverage") String coverageName,
             @CliOption(key = "recalculate", mandatory = false, help = "How to recalculate bbox (nativebbox,latlonbbox)") String recalculate
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + workspace + "/coveragestores/" + coveragestore + "/file." + type + "?configure=" + configure;
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/coveragestores/" + URLUtil.encode(coveragestore) + "/file." + type + "?configure=" + configure;
         if (coverageName != null) {
             url += "&coverageName=" + coverageName;
         }

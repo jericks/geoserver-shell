@@ -1,12 +1,9 @@
 package org.geoserver.shell;
 
-import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +13,8 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -25,15 +24,21 @@ public class GeoWebCacheCommands implements CommandMarker {
     private Geoserver geoserver;
 
     // @TODO http://docs.geoserver.org/stable/en/user/geowebcache/rest/layers.html#layer-list has /gwc/rest/seed/layers
+    // if should be /gwc/rest/layers
     @CliCommand(value = "gwc layer list", help = "List GeoWebCache Layers.")
     public String listLayers() throws Exception {
         String url = geoserver.getUrl() + "/gwc/rest/layers";
         String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         StringBuilder builder = new StringBuilder();
         Element element = JDOMBuilder.buildElement(xml);
+        List<String> names = new ArrayList<String>();
         List<Element> layerElements = element.getChildren("layer");
         for (Element layerElement : layerElements) {
-            builder.append(layerElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+            names.add(layerElement.getChildText("name"));
+        }
+        Collections.sort(names);
+        for (String name : names) {
+            builder.append(name).append(OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
     }
@@ -106,16 +111,15 @@ public class GeoWebCacheCommands implements CommandMarker {
             metaWidthHeightElement.addContent(new Element("int").setText(metaHeight));
             element.addContent(metaWidthHeightElement);
         }
-        String contents = new XMLOutputter(Format.getPrettyFormat()).outputString(element);
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response = HTTPUtils.put(url, contents, contentType, geoserver.getUser(), geoserver.getPassword());
+        String contents = JDOMUtil.toString(element);
+        String response = HTTPUtils.putXml(url, contents, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
     @CliCommand(value = "gwc geoserver layer modify", help = "Modify a GeoWebCache Layer from a GeoServer Layer.")
     public boolean modifyGeoServerLayer(
             @CliOption(key = "name", mandatory = true, help = "The GeoServer layer name") String name,
-            @CliOption(key = "enabled", mandatory = false, help = "The enabled flag", unspecifiedDefaultValue = "true") boolean enabled,
+            @CliOption(key = "enabled", mandatory = false, help = "The enabled flag") String enabled,
             @CliOption(key = "mimetype", mandatory = false, help = "The mime type") String mimeType,
             @CliOption(key = "gridsetname", mandatory = false, help = "The grid set name") String gridSetName,
             @CliOption(key = "gutter", mandatory = false, help = "The gutter") String gutter,
@@ -131,7 +135,9 @@ public class GeoWebCacheCommands implements CommandMarker {
         if (gridSetName != null) {
             element.addContent(new Element("gridSubsets").addContent(new Element("gridSubset").addContent(new Element("gridSetName").setText(gridSetName))));
         }
-        element.addContent(new Element("enabled").setText(String.valueOf(enabled)));
+        if (enabled != null) {
+            element.addContent(new Element("enabled").setText(enabled));
+        }
         if (gutter != null) {
             element.addContent(new Element("gutter").setText(gutter));
         }
@@ -141,9 +147,8 @@ public class GeoWebCacheCommands implements CommandMarker {
             metaWidthHeightElement.addContent(new Element("int").setText(metaHeight));
             element.addContent(metaWidthHeightElement);
         }
-        String contents = new XMLOutputter(Format.getPrettyFormat()).outputString(element);
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response = HTTPUtils.post(url, contents, contentType, geoserver.getUser(), geoserver.getPassword());
+        String contents = JDOMUtil.toString(element);
+        String response = HTTPUtils.postXml(url, contents, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -165,15 +170,15 @@ public class GeoWebCacheCommands implements CommandMarker {
         element.addContent(new Element("name").setText(name));
         // Mime Formats
         String[] mimeTypes = mimeType.split(",");
-        Element mimeFormatsElement =new Element("mimeFormats");
-        for(String mime:mimeTypes) {
+        Element mimeFormatsElement = new Element("mimeFormats");
+        for (String mime : mimeTypes) {
             mimeFormatsElement.addContent(new Element("string").setText(mime));
         }
         element.addContent(mimeFormatsElement);
         // Grid Set Names
         String[] gridSetNames = gridSetName.split(",");
         Element gridSubsetsElement = new Element("gridSubsets");
-        for(String grid : gridSetNames) {
+        for (String grid : gridSetNames) {
             gridSubsetsElement.addContent(new Element("gridSubset").addContent(new Element("gridSetName").setText(grid)));
         }
         element.addContent(gridSubsetsElement);
@@ -194,9 +199,8 @@ public class GeoWebCacheCommands implements CommandMarker {
         // WMS
         element.addContent(new Element("wmsUrl").addContent(new Element("string").setText(wmsUrl)));
         element.addContent(new Element("wmsLayers").setText(wmsLayers));
-        String contents = new XMLOutputter(Format.getPrettyFormat()).outputString(element);
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response = HTTPUtils.put(url, contents, contentType, geoserver.getUser(), geoserver.getPassword());
+        String contents = JDOMUtil.toString(element);
+        String response = HTTPUtils.putXml(url, contents, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -219,8 +223,8 @@ public class GeoWebCacheCommands implements CommandMarker {
         element.addContent(new Element("name").setText(name));
         if (mimeType != null) {
             String[] mimeTypes = mimeType.split(",");
-            Element mimeFormatsElement =new Element("mimeFormats");
-            for(String mime:mimeTypes) {
+            Element mimeFormatsElement = new Element("mimeFormats");
+            for (String mime : mimeTypes) {
                 mimeFormatsElement.addContent(new Element("string").setText(mime));
             }
             element.addContent(mimeFormatsElement);
@@ -228,7 +232,7 @@ public class GeoWebCacheCommands implements CommandMarker {
         if (gridSetName != null) {
             String[] gridSetNames = gridSetName.split(",");
             Element gridSubsetsElement = new Element("gridSubsets");
-            for(String grid : gridSetNames) {
+            for (String grid : gridSetNames) {
                 gridSubsetsElement.addContent(new Element("gridSubset").addContent(new Element("gridSetName").setText(grid)));
             }
             element.addContent(gridSubsetsElement);
@@ -254,9 +258,8 @@ public class GeoWebCacheCommands implements CommandMarker {
             metaWidthHeightElement.addContent(new Element("int").setText(metaHeight));
             element.addContent(metaWidthHeightElement);
         }
-        String contents = new XMLOutputter(Format.getPrettyFormat()).outputString(element);
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response = HTTPUtils.post(url, contents, contentType, geoserver.getUser(), geoserver.getPassword());
+        String contents = JDOMUtil.toString(element);
+        String response = HTTPUtils.postXml(url, contents, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -333,19 +336,15 @@ public class GeoWebCacheCommands implements CommandMarker {
     public boolean seed(
             @CliOption(key = "name", mandatory = true, help = "The layer name") String name,
             @CliOption(key = "bounds", mandatory = false, help = "The bounds (minX,minY,maxX,maxY)") String bounds,
-            @CliOption(key = "gridset", mandatory = true, help = "The bounds (minX,minY,maxX,maxY)") String gridSet,
-            @CliOption(key = "start", mandatory = true, help = "The bounds (minX,minY,maxX,maxY)") int zoomStart,
-            @CliOption(key = "stop", mandatory = true, help = "The bounds (minX,minY,maxX,maxY)") int zoomStop,
+            @CliOption(key = "gridset", mandatory = true, help = "The grid set") String gridSet,
+            @CliOption(key = "start", mandatory = true, help = "The start zoom level") int zoomStart,
+            @CliOption(key = "stop", mandatory = true, help = "The stop zoom level") int zoomStop,
             @CliOption(key = "format", mandatory = false, unspecifiedDefaultValue = "image/png", help = "The image format") String format,
             @CliOption(key = "threads", mandatory = false, unspecifiedDefaultValue = "1", help = "The number of threads") int threads
     ) throws Exception {
         String url = geoserver.getUrl() + "/gwc/rest/seed/" + URLUtil.encode(name) + ".xml";
         String contents = createSeedXml("seed", name, bounds, gridSet, zoomStart, zoomStop, format, threads);
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response = HTTPUtils.post(url, contents, contentType, geoserver.getUser(), geoserver.getPassword());
-        System.out.println(url);
-        System.out.println(contents);
-        System.out.println(response);
+        String response = HTTPUtils.postXml(url, contents, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -353,16 +352,15 @@ public class GeoWebCacheCommands implements CommandMarker {
     public boolean reseed(
             @CliOption(key = "name", mandatory = true, help = "The layer name") String name,
             @CliOption(key = "bounds", mandatory = false, help = "The bounds (minX,minY,maxX,maxY)") String bounds,
-            @CliOption(key = "gridset", mandatory = true, help = "The bounds (minX,minY,maxX,maxY)") String gridSet,
-            @CliOption(key = "start", mandatory = true, help = "The bounds (minX,minY,maxX,maxY)") int zoomStart,
-            @CliOption(key = "stop", mandatory = true, help = "The bounds (minX,minY,maxX,maxY)") int zoomStop,
+            @CliOption(key = "gridset", mandatory = true, help = "The grid set") String gridSet,
+            @CliOption(key = "start", mandatory = true, help = "The start zoom level") int zoomStart,
+            @CliOption(key = "stop", mandatory = true, help = "The stop zoom level") int zoomStop,
             @CliOption(key = "format", mandatory = false, unspecifiedDefaultValue = "image/png", help = "The image format") String format,
             @CliOption(key = "threads", mandatory = false, unspecifiedDefaultValue = "1", help = "The number of threads") int threads
     ) throws Exception {
         String url = geoserver.getUrl() + "/gwc/rest/seed/" + URLUtil.encode(name) + ".xml";
         String contents = createSeedXml("reseed", name, bounds, gridSet, zoomStart, zoomStop, format, threads);
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response = HTTPUtils.post(url, contents, contentType, geoserver.getUser(), geoserver.getPassword());
+        String response = HTTPUtils.postXml(url, contents, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -370,15 +368,14 @@ public class GeoWebCacheCommands implements CommandMarker {
     public boolean truncate(
             @CliOption(key = "name", mandatory = true, help = "The layer name") String name,
             @CliOption(key = "bounds", mandatory = false, help = "The bounds (minX,minY,maxX,maxY)") String bounds,
-            @CliOption(key = "gridset", mandatory = true, help = "The bounds (minX,minY,maxX,maxY)") String gridSet,
-            @CliOption(key = "start", mandatory = true, help = "The bounds (minX,minY,maxX,maxY)") int zoomStart,
-            @CliOption(key = "stop", mandatory = true, help = "The bounds (minX,minY,maxX,maxY)") int zoomStop,
+            @CliOption(key = "gridset", mandatory = true, help = "The grid set") String gridSet,
+            @CliOption(key = "start", mandatory = true, help = "The start zoom level") int zoomStart,
+            @CliOption(key = "stop", mandatory = true, help = "The stop zoom level") int zoomStop,
             @CliOption(key = "format", mandatory = false, unspecifiedDefaultValue = "image/png", help = "The image format") String format
     ) throws Exception {
         String url = geoserver.getUrl() + "/gwc/rest/seed/" + URLUtil.encode(name) + ".xml";
         String contents = createSeedXml("truncate", name, bounds, gridSet, zoomStart, zoomStop, format, 1);
-        String contentType = GeoServerRESTPublisher.Format.XML.getContentType();
-        String response = HTTPUtils.post(url, contents, contentType, geoserver.getUser(), geoserver.getPassword());
+        String response = HTTPUtils.postXml(url, contents, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -404,8 +401,7 @@ public class GeoWebCacheCommands implements CommandMarker {
         element.addContent(new Element("format").setText(format));
         element.addContent(new Element("type").setText(type));
         element.addContent(new Element("threadCount").setText(String.valueOf(threads)));
-        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-        String str = outputter.outputString(element);
+        String str = JDOMUtil.toString(element);
         return str;
     }
 }

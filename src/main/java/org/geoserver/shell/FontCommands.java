@@ -22,12 +22,12 @@ public class FontCommands implements CommandMarker {
 
     @CliCommand(value = "font list", help = "List fonts.")
     public String list(
-        @CliOption(key = "search", mandatory = false, help = "The font name search string") String search
+            @CliOption(key = "search", mandatory = false, help = "The font name search string") String search
     ) throws Exception {
         String fonts = HTTPUtils.get(geoserver.getUrl() + "/rest/fonts.xml", geoserver.getUser(), geoserver.getPassword());
         List<String> names = getFontNames(fonts);
         StringBuilder builder = new StringBuilder();
-        for(String name : names) {
+        for (String name : names) {
             if (search == null || name.startsWith(search)) {
                 builder.append(name).append(OsUtils.LINE_SEPARATOR);
             }
@@ -39,7 +39,7 @@ public class FontCommands implements CommandMarker {
         Element root = JDOMBuilder.buildElement(xml);
         List<Element> children = root.getChild("fonts").getChildren("entry");
         List<String> fonts = new ArrayList<String>();
-        for(Element elem : children) {
+        for (Element elem : children) {
             fonts.add(elem.getTextTrim());
         }
         Collections.sort(fonts);

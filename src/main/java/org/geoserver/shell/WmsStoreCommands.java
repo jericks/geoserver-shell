@@ -10,6 +10,8 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -27,8 +29,13 @@ public class WmsStoreCommands implements CommandMarker {
         StringBuilder builder = new StringBuilder();
         Element element = JDOMBuilder.buildElement(xml);
         List<Element> wmsStoreElements = element.getChildren("wmsStore");
+        List<String> names = new ArrayList<String>();
         for (Element wmsStoreElement : wmsStoreElements) {
-            builder.append(wmsStoreElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+            names.add(wmsStoreElement.getChildText("name"));
+        }
+        Collections.sort(names);
+        for (String name : names) {
+            builder.append(name).append(OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
     }
@@ -56,8 +63,8 @@ public class WmsStoreCommands implements CommandMarker {
             List<Element> entryElements = metadataElement.getChildren("entry");
             if (entryElements.size() > 0) {
                 builder.append(TAB).append("Metadata: ").append(OsUtils.LINE_SEPARATOR);
-                for(Element entryElement : entryElements) {
-                   builder.append(TAB).append(TAB).append(entryElement.getAttributeValue("key")).append(": ").append(entryElement.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
+                for (Element entryElement : entryElements) {
+                    builder.append(TAB).append(TAB).append(entryElement.getAttributeValue("key")).append(": ").append(entryElement.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
                 }
             }
         }
@@ -69,9 +76,9 @@ public class WmsStoreCommands implements CommandMarker {
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "store", mandatory = true, help = "The name") String store,
             @CliOption(key = "url", mandatory = true, help = "The capabilities url") String capabilitiesUrl,
-            @CliOption(key = "maxconnections", mandatory = false, unspecifiedDefaultValue = "6",  help = "The maximum number of connections") int maxConnections,
-            @CliOption(key = "readtimeout", mandatory = false, unspecifiedDefaultValue = "60",  help = "The read timeout") int readTimeout,
-            @CliOption(key = "connecttimeout", mandatory = false, unspecifiedDefaultValue = "30",  help = "The connect timeout") int connectTimeout,
+            @CliOption(key = "maxconnections", mandatory = false, unspecifiedDefaultValue = "6", help = "The maximum number of connections") int maxConnections,
+            @CliOption(key = "readtimeout", mandatory = false, unspecifiedDefaultValue = "60", help = "The read timeout") int readTimeout,
+            @CliOption(key = "connecttimeout", mandatory = false, unspecifiedDefaultValue = "30", help = "The connect timeout") int connectTimeout,
             @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "Whether the store should be enabled") boolean enabled
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores.xml";
@@ -93,7 +100,7 @@ public class WmsStoreCommands implements CommandMarker {
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "store", mandatory = true, help = "The name") String store,
             @CliOption(key = "url", mandatory = false, help = "The capabilities url") String capabilitiesUrl,
-            @CliOption(key = "maxconnections", mandatory = false,  help = "The maximum number of connections") String maxConnections,
+            @CliOption(key = "maxconnections", mandatory = false, help = "The maximum number of connections") String maxConnections,
             @CliOption(key = "readtimeout", mandatory = false, help = "The read timeout") String readTimeout,
             @CliOption(key = "connecttimeout", mandatory = false, help = "The connect timeout") String connectTimeout,
             @CliOption(key = "enabled", mandatory = false, help = "Whether the store should be enabled") String enabled
@@ -136,13 +143,18 @@ public class WmsStoreCommands implements CommandMarker {
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "store", mandatory = true, help = "The WMS Store") String store
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) +"/wmslayers.xml";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) + "/wmslayers.xml";
         String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         StringBuilder builder = new StringBuilder();
         Element element = JDOMBuilder.buildElement(xml);
         List<Element> wmsStoreElements = element.getChildren("wmsLayer");
+        List<String> names = new ArrayList<String>();
         for (Element wmsStoreElement : wmsStoreElements) {
-            builder.append(wmsStoreElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+            names.add(wmsStoreElement.getChildText("name"));
+        }
+        Collections.sort(names);
+        for (String name : names) {
+            builder.append(name).append(OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
     }
@@ -152,14 +164,18 @@ public class WmsStoreCommands implements CommandMarker {
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "store", mandatory = true, help = "The WMS Store") String store
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) +"/wmslayers.xml?list=available";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) + "/wmslayers.xml?list=available";
         String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
-        System.out.println(xml);
         StringBuilder builder = new StringBuilder();
         Element element = JDOMBuilder.buildElement(xml);
         List<Element> wmsStoreElements = element.getChildren("wmsLayerName");
+        List<String> names = new ArrayList<String>();
         for (Element wmsStoreElement : wmsStoreElements) {
-            builder.append(wmsStoreElement.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
+            names.add(wmsStoreElement.getTextTrim());
+        }
+        Collections.sort(names);
+        for (String name : names) {
+            builder.append(name).append(OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
     }
@@ -170,7 +186,7 @@ public class WmsStoreCommands implements CommandMarker {
             @CliOption(key = "store", mandatory = true, help = "The WMS Store") String store,
             @CliOption(key = "layer", mandatory = true, help = "The WMS Layer") String layer
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) +"/wmslayers/" + URLUtil.encode(layer) + ".xml";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) + "/wmslayers/" + URLUtil.encode(layer) + ".xml";
         String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         Element wmsLayerElement = JDOMBuilder.buildElement(xml);
         String TAB = "   ";
@@ -232,7 +248,7 @@ public class WmsStoreCommands implements CommandMarker {
             @CliOption(key = "projectionpolicy", mandatory = false, help = "The projection policy") String projectionPolicy,
             @CliOption(key = "recalculate", mandatory = false, help = "Recalculate bounding boxes: nativebbox,latlonbbox", unspecifiedDefaultValue = "") String recalculate
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) +"/wmslayers.xml";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) + "/wmslayers.xml";
         if (recalculate != null) {
             url += "?recalculate=" + recalculate;
         }
@@ -250,7 +266,7 @@ public class WmsStoreCommands implements CommandMarker {
             String[] keys = keywords.split(",");
             if (keys.length > 0) {
                 Element keywordsElement = new Element("keywords");
-                for(String key : keys) {
+                for (String key : keys) {
                     keywordsElement.addContent(new Element("string").setText(key));
                 }
                 element.addContent(keywordsElement);
@@ -281,7 +297,7 @@ public class WmsStoreCommands implements CommandMarker {
             @CliOption(key = "projectionpolicy", mandatory = false, help = "The projection policy") String projectionPolicy,
             @CliOption(key = "recalculate", mandatory = false, help = "Recalculate bounding boxes: nativebbox,latlonbbox") String recalculate
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) +"/wmslayers/" + URLUtil.encode(layer) + ".xml";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) + "/wmslayers/" + URLUtil.encode(layer) + ".xml";
         if (recalculate != null) {
             url += "?recalculate=" + recalculate;
         }
@@ -303,7 +319,7 @@ public class WmsStoreCommands implements CommandMarker {
             String[] keys = keywords.split(",");
             if (keys.length > 0) {
                 Element keywordsElement = new Element("keywords");
-                for(String key : keys) {
+                for (String key : keys) {
                     keywordsElement.addContent(new Element("string").setText(key));
                 }
                 element.addContent(keywordsElement);
@@ -327,7 +343,7 @@ public class WmsStoreCommands implements CommandMarker {
             @CliOption(key = "layer", mandatory = true, help = "The WMS Layer") String layer,
             @CliOption(key = "recurse", mandatory = false, help = "Whether to delete all associated layers", unspecifiedDefaultValue = "false", specifiedDefaultValue = "false") boolean recurse
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) +"/wmslayers/" + URLUtil.encode(layer) + ".xml?recurse=" + recurse;
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) + "/wmslayers/" + URLUtil.encode(layer) + ".xml?recurse=" + recurse;
         return HTTPUtils.delete(url, geoserver.getUser(), geoserver.getPassword());
     }
 }

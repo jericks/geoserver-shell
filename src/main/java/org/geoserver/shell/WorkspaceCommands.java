@@ -3,13 +3,10 @@ package org.geoserver.shell;
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
-import it.geosolutions.geoserver.rest.decoder.RESTNamespace;
 import it.geosolutions.geoserver.rest.decoder.RESTWorkspaceList;
 import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import it.geosolutions.geoserver.rest.encoder.GSWorkspaceEncoder;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -17,8 +14,7 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.StringReader;
-import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -31,8 +27,9 @@ public class WorkspaceCommands implements CommandMarker {
     public String list() throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         List<String> names = reader.getWorkspaceNames();
+        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
-        for(String name : names) {
+        for (String name : names) {
             builder.append(name + OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
@@ -56,17 +53,6 @@ public class WorkspaceCommands implements CommandMarker {
         return nm;
     }
 
-    /*@CliCommand(value = "workspace modify", help = "Modify a workspace.")
-    public boolean modify(
-            @CliOption(key = {"", "name"}, mandatory = true, help = "The name") String name,
-            @CliOption(key = "newName", mandatory = true, help = "The new name") String newName
-    ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + name + ".xml";
-        String xml = "<workspace><name>" + newName + "</name></workspace>";
-        String response = HTTPUtils.put(url,xml, GeoServerRESTPublisher.Format.XML.getContentType(), geoserver.getUser(), geoserver.getPassword());
-        return response != null;
-    }*/
-
     @CliCommand(value = "workspace delete", help = "Delete a workspace.")
     public boolean delete(
             @CliOption(key = "name", mandatory = true, help = "The name") String name,
@@ -78,9 +64,7 @@ public class WorkspaceCommands implements CommandMarker {
     @CliCommand(value = "workspace default get", help = "Get the default workspace.")
     public String getDefault() throws Exception {
         String result = HTTPUtils.get(geoserver.getUrl() + "/rest/workspaces/default.xml", geoserver.getUser(), geoserver.getPassword());
-        SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(new StringReader(result));
-        Element elem = document.getRootElement();
+        Element elem = JDOMBuilder.buildElement(result);
         RESTWorkspaceList.RESTShortWorkspace w = new RESTWorkspaceList.RESTShortWorkspace(elem);
         return w.getName();
     }

@@ -15,9 +15,9 @@ public class GeoserverCommands implements CommandMarker {
 
     @CliCommand(value = "geoserver set", help = "Set the url, user, and password for Geoserver.")
     public void set(
-        @CliOption(key = "url", mandatory = true, unspecifiedDefaultValue = "http://localhost:8080/geoserver", help = "The url") String url,
-        @CliOption(key = "user", mandatory = false, help = "The url", unspecifiedDefaultValue = "admin") String user,
-        @CliOption(key = "password", mandatory = false, help = "The url", unspecifiedDefaultValue = "geoserver") String password
+            @CliOption(key = "url", mandatory = true, help = "The url") String url,
+            @CliOption(key = "user", mandatory = false, help = "The user name", unspecifiedDefaultValue = "admin") String user,
+            @CliOption(key = "password", mandatory = false, help = "The password", unspecifiedDefaultValue = "geoserver") String password
     ) {
         geoserver.setUrl(url);
         geoserver.setUser(user);
