@@ -1,15 +1,36 @@
+GeoServer Shell
+===============
+GeoServer Shell uses the spring-shell library used by Spring Roo to manage Geoserver.
 
-.. raw:: html
+Use
+---
 
-    <pre>"
-       ____                                           ____  _          _ _
-      / ___| ___  ___  ___  ___ _ ____   _____ _ __  / ___|| |__   ___| | |
-     | |  _ / _ \/ _ \/ __|/ _ \ '__\ \ / / _ \ '__| \___ \| '_ \ / _ \ | |
-     | |_| |  __/ (_) \__ \  __/ |   \ V /  __/ |     ___) | | | |  __/ | |
-      \____|\___|\___/|___/\___|_|    \_/ \___|_|    |____/|_| |_|\___|_|_|
-    "</pre>
+Clone repository
 
-GeoServer Shell uses the spring-shell library used by Spring Roo to manage Geoserver. It is very much a work in progress.
+    git clone git://github.com/jericks/geoserver-shell.git
+
+Build the code
+
+    mvn clean install
+
+Run the geoserver-shell
+
+    java -jar target/geoserver-shell-1.0-SNAPSHOT.jar
+
+Enter commands
+
+    gs-shell>geoserver set --url http://localhost:8080/geoserver --user admin --password geoserver
+    gs-shell>workspace list
+    cite
+    it.geosolutions
+    nurc
+    sde
+    sf
+    tiger
+    topp
+    gs-shell>workspace create --name test
+    true
+    gs-shell>exit
 
 Libraries
 ---------
