@@ -2,10 +2,10 @@ GeoServer Shell
 ===============
 GeoServer Shell uses the spring-shell library used by Spring Roo to manage Geoserver.
 
-Use
----
+Usage
+-----
 
-Clone repository::
+Clone the repository::
 
     git clone git://github.com/jericks/geoserver-shell.git
 
