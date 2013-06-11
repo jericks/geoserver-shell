@@ -8,6 +8,15 @@ public class Geoserver {
 
     private String password;
 
+    public Geoserver() {
+    }
+
+    public Geoserver(String url, String user, String password) {
+        this.url = url;
+        this.user = user;
+        this.password = password;
+    }
+
     public String getUrl() {
         return url;
     }

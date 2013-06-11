@@ -1,0 +1,11 @@
+<workspaces>
+	<workspace>
+		<name>it.geosolutions</name>
+	</workspace>
+	<workspace>
+		<name>cite</name>
+	</workspace>
+	<workspace>
+		<name>topp</name>
+	</workspace>
+</workspaces>
