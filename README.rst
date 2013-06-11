@@ -5,21 +5,22 @@ GeoServer Shell uses the spring-shell library used by Spring Roo to manage Geose
 Use
 ---
 
-Clone repository
+Clone repository::
 
     git clone git://github.com/jericks/geoserver-shell.git
 
-Build the code
+Build the code::
 
     mvn clean install
 
-Run the geoserver-shell
+Run the geoserver-shell::
 
     java -jar target/geoserver-shell-1.0-SNAPSHOT.jar
 
-Enter commands
+Enter commands::
 
     gs-shell>geoserver set --url http://localhost:8080/geoserver --user admin --password geoserver
+
     gs-shell>workspace list
     cite
     it.geosolutions
@@ -28,8 +29,10 @@ Enter commands
     sf
     tiger
     topp
+
     gs-shell>workspace create --name test
     true
+
     gs-shell>exit
 
 Libraries
