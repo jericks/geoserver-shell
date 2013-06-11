@@ -1,0 +1,23 @@
+<namespaces>
+	<namespace>
+		<name>it.geosolutions</name>
+	</namespace>
+	<namespace>
+		<name>cite</name>
+	</namespace>
+	<namespace>
+		<name>tiger</name>
+	</namespace>
+	<namespace>
+		<name>sde</name>
+	</namespace>
+	<namespace>
+		<name>topp</name>
+	</namespace>
+	<namespace>
+		<name>sf</name>
+	</namespace>
+	<namespace>
+		<name>nurc</name>
+	</namespace>
+</namespaces>
