@@ -1,5 +1,10 @@
-GeoServer Shell
-===============
+   ____                                           ____  _          _ _
+  / ___| ___  ___  ___  ___ _ ____   _____ _ __  / ___|| |__   ___| | |
+ | |  _ / _ \/ _ \/ __|/ _ \ '__\ \ / / _ \ '__| \___ \| '_ \ / _ \ | |
+ | |_| |  __/ (_) \__ \  __/ |   \ V /  __/ |     ___) | | | |  __/ | |
+  \____|\___|\___/|___/\___|_|    \_/ \___|_|    |____/|_| |_|\___|_|_|
+
+
 GeoServer Shell uses the spring-shell library used by Spring Roo to manage Geoserver. It is very much a work in progress.
 
 Libraries
