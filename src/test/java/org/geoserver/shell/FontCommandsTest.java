@@ -9,9 +9,7 @@ import static com.xebialabs.restito.builder.stub.StubHttp.whenHttp;
 import static com.xebialabs.restito.builder.verify.VerifyHttp.verifyHttp;
 import static com.xebialabs.restito.semantics.Action.status;
 import static com.xebialabs.restito.semantics.Action.stringContent;
-import static com.xebialabs.restito.semantics.Condition.get;
-import static com.xebialabs.restito.semantics.Condition.method;
-import static com.xebialabs.restito.semantics.Condition.uri;
+import static com.xebialabs.restito.semantics.Condition.*;
 import static junit.framework.Assert.assertEquals;
 
 public class FontCommandsTest extends BaseTest {
@@ -24,16 +22,16 @@ public class FontCommandsTest extends BaseTest {
         FontCommands commands = new FontCommands();
         commands.setGeoserver(geoserver);
         String actual = commands.list(null);
-        String expected = "Bordeaux Roman Bold LET" + OsUtils.LINE_SEPARATOR + 
-                "Bradley Hand ITC TT" + OsUtils.LINE_SEPARATOR + 
-                "Didot-Bold" + OsUtils.LINE_SEPARATOR + 
-                "GillSans-Light" + OsUtils.LINE_SEPARATOR + 
-                "HiraMinPro-W3" + OsUtils.LINE_SEPARATOR + 
-                "LiHeiPro" + OsUtils.LINE_SEPARATOR + 
-                "Lucida Bright Demibold Italic" + OsUtils.LINE_SEPARATOR + 
-                "LucidaSans" + OsUtils.LINE_SEPARATOR + 
-                "Palatino" + OsUtils.LINE_SEPARATOR + 
-                "Skia-Regular_Light-Condensed" + OsUtils.LINE_SEPARATOR + 
+        String expected = "Bordeaux Roman Bold LET" + OsUtils.LINE_SEPARATOR +
+                "Bradley Hand ITC TT" + OsUtils.LINE_SEPARATOR +
+                "Didot-Bold" + OsUtils.LINE_SEPARATOR +
+                "GillSans-Light" + OsUtils.LINE_SEPARATOR +
+                "HiraMinPro-W3" + OsUtils.LINE_SEPARATOR +
+                "LiHeiPro" + OsUtils.LINE_SEPARATOR +
+                "Lucida Bright Demibold Italic" + OsUtils.LINE_SEPARATOR +
+                "LucidaSans" + OsUtils.LINE_SEPARATOR +
+                "Palatino" + OsUtils.LINE_SEPARATOR +
+                "Skia-Regular_Light-Condensed" + OsUtils.LINE_SEPARATOR +
                 "StoneSansITCTT-SemiIta" + OsUtils.LINE_SEPARATOR;
         assertEquals(expected, actual);
 
@@ -48,7 +46,7 @@ public class FontCommandsTest extends BaseTest {
         FontCommands commands = new FontCommands();
         commands.setGeoserver(geoserver);
         String actual = commands.list("Lu");
-        String expected =  "Lucida Bright Demibold Italic" + OsUtils.LINE_SEPARATOR +
+        String expected = "Lucida Bright Demibold Italic" + OsUtils.LINE_SEPARATOR +
                 "LucidaSans" + OsUtils.LINE_SEPARATOR;
         assertEquals(expected, actual);
 
