@@ -20,12 +20,17 @@ public class FontCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "font list", help = "List fonts.")
     public String list(
             @CliOption(key = "search", mandatory = false, help = "The font name search string") String search
     ) throws Exception {
         String fonts = HTTPUtils.get(geoserver.getUrl() + "/rest/fonts.xml", geoserver.getUser(), geoserver.getPassword());
         List<String> names = getFontNames(fonts);
+        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
         for (String name : names) {
             if (search == null || name.startsWith(search)) {
