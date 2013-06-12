@@ -18,6 +18,10 @@ public class AboutCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "version list", help = "Get versions.")
     public String versionList() throws Exception {
         String TAB = "   ";

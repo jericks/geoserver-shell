@@ -1,0 +1,16 @@
+<about>
+	<resource name="GeoServer">
+		<Build-Timestamp>20-Apr-2013 13:14</Build-Timestamp>
+		<Git-Revision>24d33ae18298272654ae86a981e4815f7f935f1d</Git-Revision>
+		<Version>2.3.1</Version>
+	</resource>
+	<resource name="GeoTools">
+		<Build-Timestamp>20-Apr-2013 11:03</Build-Timestamp>
+		<Git-Revision>f25b08094d1bf7e0949994f4971bc21fb117d37b</Git-Revision>
+		<Version>9.1</Version>
+	</resource>
+	<resource name="GeoWebCache">
+		<Git-Revision>c29e8dd283d29c764dd497bb84172d33fbcdd175/c29e8dd283d29c764dd497bb84172d33fbcdd175</Git-Revision>
+		<Version>1.4-SNAPSHOT</Version>
+	</resource>
+</about>

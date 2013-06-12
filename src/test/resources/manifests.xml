@@ -1,0 +1,32 @@
+<about>
+	<resource name="gt-xsd-gml3-9.1">
+		<Manifest-Version>1.0</Manifest-Version>
+		<Archiver-Version>Plexus Archiver</Archiver-Version>
+		<Built-By>jetty</Built-By>
+		<Build-Timestamp>20-Apr-2013 11:03</Build-Timestamp>
+		<Git-Revision>f25b08094d1bf7e0949994f4971bc21fb117d37b</Git-Revision>
+		<Build-Jdk>1.6.0_22</Build-Jdk>
+		<Project-Version>9.1</Project-Version>
+		<Created-By>Apache Maven</Created-By>
+	</resource>
+	<resource name="gt-xsd-ows-9.1">
+		<Manifest-Version>1.0</Manifest-Version>
+		<Archiver-Version>Plexus Archiver</Archiver-Version>
+		<Built-By>jetty</Built-By>
+		<Build-Timestamp>20-Apr-2013 11:03</Build-Timestamp>
+		<Git-Revision>f25b08094d1bf7e0949994f4971bc21fb117d37b</Git-Revision>
+		<Build-Jdk>1.6.0_22</Build-Jdk>
+		<Project-Version>9.1</Project-Version>
+		<Created-By>Apache Maven</Created-By>
+	</resource>
+	<resource name="gt-xsd-sld-9.1">
+		<Manifest-Version>1.0</Manifest-Version>
+		<Archiver-Version>Plexus Archiver</Archiver-Version>
+		<Built-By>jetty</Built-By>
+		<Build-Timestamp>20-Apr-2013 11:03</Build-Timestamp>
+		<Git-Revision>f25b08094d1bf7e0949994f4971bc21fb117d37b</Git-Revision>
+		<Build-Jdk>1.6.0_22</Build-Jdk>
+		<Project-Version>9.1</Project-Version>
+		<Created-By>Apache Maven</Created-By>
+	</resource>
+</about>
