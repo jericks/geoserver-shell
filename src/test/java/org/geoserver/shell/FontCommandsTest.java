@@ -16,7 +16,7 @@ public class FontCommandsTest extends BaseTest {
 
     @Test
     public void fontList() throws Exception {
-        whenHttp(server).match(get("/geoserver/rest/fonts.xml")).then(stringContent(getResource("fonts.xml")), status(HttpStatus.OK_200));
+        whenHttp(server).match(get("/geoserver/rest/fonts.xml")).then(stringContent(getResourceString("fonts.xml")), status(HttpStatus.OK_200));
 
         Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
         FontCommands commands = new FontCommands();
@@ -40,7 +40,7 @@ public class FontCommandsTest extends BaseTest {
 
     @Test
     public void fontListWithSearch() throws Exception {
-        whenHttp(server).match(get("/geoserver/rest/fonts.xml")).then(stringContent(getResource("fonts.xml")), status(HttpStatus.OK_200));
+        whenHttp(server).match(get("/geoserver/rest/fonts.xml")).then(stringContent(getResourceString("fonts.xml")), status(HttpStatus.OK_200));
 
         Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
         FontCommands commands = new FontCommands();

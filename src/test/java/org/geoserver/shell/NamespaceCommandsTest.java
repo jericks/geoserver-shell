@@ -19,7 +19,7 @@ public class NamespaceCommandsTest extends BaseTest {
 
     @Test
     public void listNamespaces() throws Exception {
-        whenHttp(server).match(get("/geoserver/rest/namespaces.xml")).then(stringContent(getResource("namespaces.xml")), status(HttpStatus.OK_200));
+        whenHttp(server).match(get("/geoserver/rest/namespaces.xml")).then(stringContent(getResourceString("namespaces.xml")), status(HttpStatus.OK_200));
 
         Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
         NamespaceCommands commands = new NamespaceCommands();
@@ -35,7 +35,7 @@ public class NamespaceCommandsTest extends BaseTest {
 
     @Test
     public void getNamespace() throws Exception {
-        whenHttp(server).match(get("/geoserver/rest/namespaces/topp.xml")).then(stringContent(getResource("namespace.xml")), status(HttpStatus.OK_200));
+        whenHttp(server).match(get("/geoserver/rest/namespaces/topp.xml")).then(stringContent(getResourceString("namespace.xml")), status(HttpStatus.OK_200));
 
         Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
         NamespaceCommands commands = new NamespaceCommands();

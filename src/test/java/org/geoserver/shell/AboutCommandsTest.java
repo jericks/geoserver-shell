@@ -16,7 +16,7 @@ public class AboutCommandsTest extends BaseTest {
 
     @Test
     public void versionList() throws Exception {
-        whenHttp(server).match(get("/geoserver/rest/about/versions.xml")).then(stringContent(getResource("version.xml")), status(HttpStatus.OK_200));
+        whenHttp(server).match(get("/geoserver/rest/about/versions.xml")).then(stringContent(getResourceString("version.xml")), status(HttpStatus.OK_200));
 
         Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
         AboutCommands commands = new AboutCommands();
@@ -44,7 +44,7 @@ public class AboutCommandsTest extends BaseTest {
 
     @Test
     public void manifestList() throws Exception {
-        whenHttp(server).match(get("/geoserver/rest/about/manifests.xml")).then(stringContent(getResource("manifests.xml")), status(HttpStatus.OK_200));
+        whenHttp(server).match(get("/geoserver/rest/about/manifests.xml")).then(stringContent(getResourceString("manifests.xml")), status(HttpStatus.OK_200));
 
         Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
         AboutCommands commands = new AboutCommands();
@@ -58,7 +58,7 @@ public class AboutCommandsTest extends BaseTest {
 
     @Test
     public void manifestGet() throws Exception {
-        whenHttp(server).match(get("/geoserver/rest/about/manifests.xml")).then(stringContent(getResource("manifests.xml")), status(HttpStatus.OK_200));
+        whenHttp(server).match(get("/geoserver/rest/about/manifests.xml")).then(stringContent(getResourceString("manifests.xml")), status(HttpStatus.OK_200));
 
         Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
         AboutCommands commands = new AboutCommands();

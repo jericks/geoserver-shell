@@ -17,7 +17,7 @@ public class WorkspaceCommandsTest extends BaseTest {
 
     @Test
     public void listWorkspaces() throws Exception {
-        whenHttp(server).match(get("/geoserver/rest/workspaces.xml")).then(stringContent(getResource("workspaces.xml")), status(HttpStatus.OK_200));
+        whenHttp(server).match(get("/geoserver/rest/workspaces.xml")).then(stringContent(getResourceString("workspaces.xml")), status(HttpStatus.OK_200));
 
         Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
         WorkspaceCommands commands = new WorkspaceCommands();
@@ -31,7 +31,7 @@ public class WorkspaceCommandsTest extends BaseTest {
 
     @Test
     public void getWorkspace() throws Exception {
-        whenHttp(server).match(get("/geoserver/rest/workspaces/topp.xml")).then(stringContent(getResource("workspace.xml")), status(HttpStatus.OK_200));
+        whenHttp(server).match(get("/geoserver/rest/workspaces/topp.xml")).then(stringContent(getResourceString("workspace.xml")), status(HttpStatus.OK_200));
 
         Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
         WorkspaceCommands commands = new WorkspaceCommands();

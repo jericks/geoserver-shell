@@ -6,7 +6,9 @@ import com.xebialabs.restito.server.StubServer;
 import org.junit.After;
 import org.junit.Before;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 public class BaseTest {
 
@@ -23,7 +25,11 @@ public class BaseTest {
         server.stop();
     }
 
-    protected String getResource(String path) throws IOException {
+    protected File getResourceFile(String path) throws Exception {
+        return new File(Resources.getResource(path).toURI());
+    }
+
+    protected String getResourceString(String path) throws IOException {
         return Resources.toString(Resources.getResource(path), Charsets.UTF_8);
     }
 

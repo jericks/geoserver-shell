@@ -4,7 +4,9 @@ import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTStyleList;
+import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -27,6 +29,10 @@ public class StyleCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "style list", help = "List style.")
     public String list(
             @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace
@@ -47,7 +53,27 @@ public class StyleCommands implements CommandMarker {
         return RESTStyleList.build(HTTPUtils.get(geoserver.getUrl() + url, geoserver.getUser(), geoserver.getPassword()));
     }
 
-    @CliCommand(value = "style get", help = "Get the SLD of a style.")
+    @CliCommand(value = "style get", help = "Get a style.")
+    public String getStyle(
+            @CliOption(key = "name", mandatory = true, help = "The name") String name,
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace
+    ) throws Exception {
+        String url = geoserver.getUrl() + "/rest";
+        if (workspace != null) {
+            url += "/workspaces/" + URLUtil.encode(workspace);
+        }
+        url += "/styles/" + URLUtil.encode(name) + ".xml";
+        String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
+        Element element = JDOMBuilder.buildElement(xml);
+        StringBuilder builder = new StringBuilder();
+        String TAB = "   ";
+        builder.append(element.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+        builder.append(TAB).append("SLD Version: ").append(element.getChild("sldVersion").getChildText("version")).append(OsUtils.LINE_SEPARATOR);
+        builder.append(TAB).append("File Name: ").append(element.getChildText("filename")).append(OsUtils.LINE_SEPARATOR);
+        return builder.toString();
+    }
+
+    @CliCommand(value = "style sld get", help = "Get the SLD of a style.")
     public String getSld(
             @CliOption(key = "name", mandatory = true, help = "The name") String name,
             @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
@@ -118,7 +144,7 @@ public class StyleCommands implements CommandMarker {
         }
     }
 
-    public boolean publishStyle(File sldFile, String name, String workspace) {
+    private boolean publishStyle(File sldFile, String name, String workspace) {
         String sUrl = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/styles";
         if (name != null && !name.isEmpty()) {
             sUrl += "?name=" + URLUtil.encode(name);
