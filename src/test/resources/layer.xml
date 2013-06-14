@@ -1,0 +1,21 @@
+<layer>
+	<name>streams</name>
+	<path>/</path>
+	<type>VECTOR</type>
+	<defaultStyle>
+		<name>simple_streams</name>
+	</defaultStyle>
+	<styles class="linked-hash-set">
+		<style>
+			<name>line</name>
+		</style>
+	</styles>
+	<resource class="featureType">
+		<name>streams</name>
+	</resource>
+	<enabled>true</enabled>
+	<attribution>
+		<logoWidth>0</logoWidth>
+		<logoHeight>0</logoHeight>
+	</attribution>
+</layer>

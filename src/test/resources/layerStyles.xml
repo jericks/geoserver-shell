@@ -1,0 +1,11 @@
+<styles>
+	<style>
+		<name>road</name>
+	</style>
+	<style>
+		<name>highway</name>
+	</style>
+	<style>
+		<name>interstate</name>
+	</style>
+</styles>

@@ -13,6 +13,7 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class LayerCommands implements CommandMarker {
 
     @Autowired
     private Geoserver geoserver;
+
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
 
     @CliCommand(value = "layer list", help = "List layers.")
     public String list() throws Exception {
@@ -94,7 +99,7 @@ public class LayerCommands implements CommandMarker {
         return response != null;
     }
 
-    @CliCommand(value = "layer remove", help = "Remove a layer.")
+    @CliCommand(value = "layer delete", help = "Delete a layer.")
     public boolean delete(
             @CliOption(key = "name", mandatory = true, help = "The name") String name,
             @CliOption(key = "recurse", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "false", help = "Whether to delete associated styles") boolean recurse
@@ -111,9 +116,14 @@ public class LayerCommands implements CommandMarker {
         String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         Element element = JDOMBuilder.buildElement(xml);
         List<Element> styleElements = element.getChildren("style");
-        StringBuilder builder = new StringBuilder();
+        List<String> names = new ArrayList<String>();
         for (Element styleElement : styleElements) {
-            builder.append(styleElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+            names.add(styleElement.getChildText("name"));
+        }
+        Collections.sort(names);
+        StringBuilder builder = new StringBuilder();
+        for (String nm : names) {
+            builder.append(nm).append(OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();
     }

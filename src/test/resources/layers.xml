@@ -1,0 +1,11 @@
+<layers>
+	<layer>
+		<name>points</name>
+	</layer>
+	<layer>
+		<name>lines</name>
+	</layer>
+	<layer>
+		<name>polygons</name>
+	</layer>
+</layers>
