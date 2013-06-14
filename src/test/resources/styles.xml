@@ -1,0 +1,22 @@
+<styles>
+	<style>
+		<name>burg</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/styles/burg.xml" type="application/xml"/>
+	</style>
+	<style>
+		<name>capitals</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/styles/capitals.xml" type="application/xml"/>
+	</style>
+	<style>
+		<name>cite_lakes</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/styles/cite_lakes.xml" type="application/xml"/>
+	</style>
+	<style>
+		<name>dem</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/styles/dem.xml" type="application/xml"/>
+	</style>
+</styles>
