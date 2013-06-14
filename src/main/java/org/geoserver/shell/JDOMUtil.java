@@ -15,8 +15,13 @@ public class JDOMUtil {
         return child;
     }
 
-    public static String toString(Element element) {
+    public static String toPrettyString(Element element) {
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+        return xmlOutputter.outputString(element);
+    }
+
+    public static String toString(Element element) {
+        XMLOutputter xmlOutputter = new XMLOutputter(Format.getRawFormat());
         return xmlOutputter.outputString(element);
     }
 }

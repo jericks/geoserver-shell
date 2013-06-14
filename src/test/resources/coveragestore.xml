@@ -1,0 +1,12 @@
+<coverageStore>
+	<name>arcGridSample</name>
+	<type>ArcGrid</type>
+	<enabled>true</enabled>
+	<workspace>
+		<name>nurc</name>
+	</workspace>
+	<__default>false</__default>
+	<url>file:coverages/arc_sample/precip30min.asc</url>
+	<coverages>
+	</coverages>
+</coverageStore>

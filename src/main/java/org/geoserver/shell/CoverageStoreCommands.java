@@ -22,6 +22,10 @@ public class CoverageStoreCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "coverage store list", help = "List coverage store.")
     public String list(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace
