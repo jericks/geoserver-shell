@@ -24,6 +24,10 @@ public class DataStoreCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "datastore list", help = "List data stores.")
     public String list(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace
@@ -96,7 +100,7 @@ public class DataStoreCommands implements CommandMarker {
     }
 
     @CliCommand(value = "datastore get", help = "Get a data store.")
-    public String getSld(
+    public String get(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "name", mandatory = true, help = "The name") String name
     ) throws Exception {
@@ -119,7 +123,7 @@ public class DataStoreCommands implements CommandMarker {
     }
 
     @CliCommand(value = "datastore delete", help = "Delete an existing data store.")
-    public boolean update(
+    public boolean delete(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "name", mandatory = true, help = "The name") String name,
             @CliOption(key = "recurse", mandatory = false, help = "Whether to recursively delete all layers (true) or not (false)", unspecifiedDefaultValue = "false", specifiedDefaultValue = "false") boolean recurse

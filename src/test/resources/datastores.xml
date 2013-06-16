@@ -1,0 +1,11 @@
+<dataStores>
+	<dataStore>
+		<name>states</name>
+	</dataStore>
+	<dataStore>
+		<name>rivers</name>
+	</dataStore>
+	<dataStore>
+		<name>geology</name>
+	</dataStore>
+</dataStores>
