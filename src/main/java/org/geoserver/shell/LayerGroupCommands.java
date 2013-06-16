@@ -22,6 +22,10 @@ public class LayerGroupCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "layer group list", help = "List layer groups.")
     public String list(
             @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace
@@ -37,8 +41,8 @@ public class LayerGroupCommands implements CommandMarker {
         return builder.toString();
     }
 
-    @CliCommand(value = "layer group add", help = "Add a layer group.")
-    public boolean add(
+    @CliCommand(value = "layer group create", help = "Create a layer group.")
+    public boolean create(
             @CliOption(key = "name", mandatory = true, help = "The name") String name,
             @CliOption(key = "layers", mandatory = true, help = "The comma delimited list of layer names") String layers,
             @CliOption(key = "styles", mandatory = true, help = "The comma delimited list of style names") String styles,
@@ -48,13 +52,17 @@ public class LayerGroupCommands implements CommandMarker {
         builder.append("<name>").append(name).append("</name>");
         builder.append("<layers>");
         for (String layer : layers.split(",")) {
-            builder.append("<layer>").append(layer).append("</layer>");
+            if (layer.trim().length() > 0) {
+                builder.append("<layer>").append(layer.trim()).append("</layer>");
+            }
         }
         builder.append("</layers>");
         if (styles != null) {
             builder.append("<styles>");
             for (String style : styles.split(",")) {
-                builder.append("<style>").append(style).append("</style>");
+                if (style.trim().length() > 0) {
+                    builder.append("<style>").append(style.trim()).append("</style>");
+                }
             }
             builder.append("</styles>");
         }
@@ -75,7 +83,7 @@ public class LayerGroupCommands implements CommandMarker {
             @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace
     ) throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
-        RESTLayerGroup layerGroup = workspace == null ? layerGroup = reader.getLayerGroup(name) : reader.getLayerGroup(name, workspace);
+        RESTLayerGroup layerGroup = workspace == null ? reader.getLayerGroup(name) : reader.getLayerGroup(workspace, name);
         String TAB = "   ";
         StringBuilder builder = new StringBuilder();
         builder.append(layerGroup.getName()).append(OsUtils.LINE_SEPARATOR);
@@ -118,15 +126,21 @@ public class LayerGroupCommands implements CommandMarker {
     ) throws Exception {
         StringBuilder builder = new StringBuilder("<layerGroup>");
         builder.append("<name>").append(name).append("</name>");
-        builder.append("<layers>");
-        for (String layer : layers.split(",")) {
-            builder.append("<layer>").append(layer).append("</layer>");
+        if (layers != null) {
+            builder.append("<layers>");
+            for (String layer : layers.split(",")) {
+                if (layer.trim().length() > 0) {
+                    builder.append("<layer>").append(layer.trim()).append("</layer>");
+                }
+            }
+            builder.append("</layers>");
         }
-        builder.append("</layers>");
         if (styles != null) {
             builder.append("<styles>");
             for (String style : styles.split(",")) {
-                builder.append("<style>").append(style).append("</style>");
+                if (style.trim().length() > 0) {
+                    builder.append("<style>").append(style.trim()).append("</style>");
+                }
             }
             builder.append("</styles>");
         }

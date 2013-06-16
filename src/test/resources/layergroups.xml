@@ -1,0 +1,11 @@
+<layerGroups>
+	<layerGroup>
+		<name>spearfish</name>
+	</layerGroup>
+	<layerGroup>
+		<name>basemap</name>
+	</layerGroup>
+	<layerGroup>
+		<name>census</name>
+	</layerGroup>
+</layerGroups>

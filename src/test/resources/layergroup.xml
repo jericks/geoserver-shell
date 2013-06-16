@@ -1,0 +1,42 @@
+<layerGroup>
+	<name>spearfish</name>
+	<mode>SINGLE</mode>
+	<publishables>
+		<published type="layer">
+			<name>sfdem</name>
+		</published>
+		<published type="layer">
+			<name>streams</name>
+		</published>
+		<published type="layer">
+			<name>roads</name>
+		</published>
+		<published type="layer">
+			<name>restricted</name>
+		</published>
+		<published type="layer">
+			<name>archsites</name>
+		</published>
+		<published type="layer">
+			<name>bugsites</name>
+		</published>
+	</publishables>
+	<styles>
+		<style/>
+		<style/>
+		<style/>
+		<style/>
+		<style/>
+		<style/>
+	</styles>
+	<bounds>
+		<minx>589425.9342365642</minx>
+		<maxx>609518.6719560538</maxx>
+		<miny>4913959.224611808</miny>
+		<maxy>4928082.949945881</maxy>
+		<crs class="projected">EPSG:26713</crs>
+	</bounds>
+	<metadata>
+		<entry key="rawStyleList"/>
+	</metadata>
+</layerGroup>
