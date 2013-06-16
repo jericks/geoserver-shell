@@ -1,0 +1,100 @@
+<featureType>
+	<name>tasmania_cities</name>
+	<nativeName>tasmania_cities</nativeName>
+	<namespace>
+		<name>topp</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/namespaces/topp.xml" type="application/xml"/>
+	</namespace>
+	<title>Tasmania cities</title>
+	<abstract>Cities in Tasmania (actually, just the capital)</abstract>
+	<keywords>
+		<string>cities</string>
+		<string>Tasmania</string>
+	</keywords>
+	<nativeCRS>
+		GEOGCS["GCS_WGS_1984", DATUM["WGS_1984", SPHEROID["WGS_1984", 6378137.0, 298.257223563]], PRIMEM["Greenwich",
+		0.0], UNIT["degree", 0.017453292519943295], AXIS["Longitude", EAST], AXIS["Latitude", NORTH]]
+	</nativeCRS>
+	<srs>EPSG:4326</srs>
+	<nativeBoundingBox>
+		<minx>145.19754</minx>
+		<maxx>148.27298000000002</maxx>
+		<miny>-43.423512</miny>
+		<maxy>-40.852802</maxy>
+		<crs>EPSG:4326</crs>
+	</nativeBoundingBox>
+	<latLonBoundingBox>
+		<minx>145.19754</minx>
+		<maxx>148.27298000000002</maxx>
+		<miny>-43.423512</miny>
+		<maxy>-40.852802</maxy>
+		<crs>EPSG:4326</crs>
+	</latLonBoundingBox>
+	<projectionPolicy>FORCE_DECLARED</projectionPolicy>
+	<enabled>true</enabled>
+	<metadata>
+		<entry key="indexingEnabled">false</entry>
+		<entry key="cacheAgeMax">3600</entry>
+		<entry key="cachingEnabled">true</entry>
+		<entry key="dirName">tasmania_cities</entry>
+		<entry key="kml.regionateFeatureLimit">10</entry>
+	</metadata>
+	<store class="dataStore">
+		<name>taz_shapes</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/workspaces/topp/datastores/taz_shapes.xml"
+				   type="application/xml"/>
+	</store>
+	<maxFeatures>0</maxFeatures>
+	<numDecimals>0</numDecimals>
+	<attributes>
+		<attribute>
+			<name>the_geom</name>
+			<minOccurs>0</minOccurs>
+			<maxOccurs>1</maxOccurs>
+			<nillable>true</nillable>
+			<binding>com.vividsolutions.jts.geom.MultiPoint</binding>
+		</attribute>
+		<attribute>
+			<name>CITY_NAME</name>
+			<minOccurs>0</minOccurs>
+			<maxOccurs>1</maxOccurs>
+			<nillable>true</nillable>
+			<binding>java.lang.String</binding>
+			<length>40</length>
+		</attribute>
+		<attribute>
+			<name>ADMIN_NAME</name>
+			<minOccurs>0</minOccurs>
+			<maxOccurs>1</maxOccurs>
+			<nillable>true</nillable>
+			<binding>java.lang.String</binding>
+			<length>42</length>
+		</attribute>
+		<attribute>
+			<name>CNTRY_NAME</name>
+			<minOccurs>0</minOccurs>
+			<maxOccurs>1</maxOccurs>
+			<nillable>true</nillable>
+			<binding>java.lang.String</binding>
+			<length>40</length>
+		</attribute>
+		<attribute>
+			<name>STATUS</name>
+			<minOccurs>0</minOccurs>
+			<maxOccurs>1</maxOccurs>
+			<nillable>true</nillable>
+			<binding>java.lang.String</binding>
+			<length>50</length>
+		</attribute>
+		<attribute>
+			<name>POP_CLASS</name>
+			<minOccurs>0</minOccurs>
+			<maxOccurs>1</maxOccurs>
+			<nillable>true</nillable>
+			<binding>java.lang.String</binding>
+			<length>22</length>
+		</attribute>
+	</attributes>
+</featureType>

@@ -24,6 +24,10 @@ public class FeatureTypeCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "featuretype list", help = "List feature types.")
     public String list(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
