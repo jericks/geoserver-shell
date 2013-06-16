@@ -124,7 +124,7 @@ public class DataStoreCommandsTest extends BaseTest {
         String charset = "UTF-8";
         boolean result = commands.upload(workspace, name, type, file, configure, target, update, charset);
         assertTrue(result);
-        Map<String,String[]> params = server.getCalls().get(0).getParameters();
+        Map<String, String[]> params = server.getCalls().get(0).getParameters();
         assertEquals(configure, params.get("configure")[0]);
         assertEquals(target, params.get("target")[0]);
         assertEquals(update, params.get("update")[0]);
