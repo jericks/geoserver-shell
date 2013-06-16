@@ -22,8 +22,13 @@ public class TemplateCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
+    // @ToDo Guard against bad combinations (workspace is required if datastore, if featureType then workspace and datastore are required)
     protected StringBuilder buildUrl(String base, String workspace, String datastore, String featureType, String coverageStore, String coverage) {
-        StringBuilder urlBuilder = new StringBuilder(geoserver.getUrl()).append("/rest");
+        StringBuilder urlBuilder = new StringBuilder(base).append("/rest");
         if (workspace != null) {
             urlBuilder.append("/workspaces/").append(URLUtil.encode(workspace));
             if (datastore != null) {
@@ -66,8 +71,8 @@ public class TemplateCommands implements CommandMarker {
         return builder.toString();
     }
 
-    @CliCommand(value = "template add", help = "Add a template.")
-    public boolean add(
+    @CliCommand(value = "template create", help = "Create a template.")
+    public boolean create(
             @CliOption(key = "file", mandatory = true, help = "The template file") File file,
             @CliOption(key = "name", mandatory = false, help = "The name of the template") String name,
             @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
@@ -83,6 +88,7 @@ public class TemplateCommands implements CommandMarker {
         } else {
             urlBuilder.append(URLUtil.encode(file.getName()));
         }
+        // @ToDo Should this be post?
         String result = HTTPUtils.put(urlBuilder.toString(), file, "plain/text", geoserver.getUser(), geoserver.getPassword());
         return result != null;
     }

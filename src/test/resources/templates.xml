@@ -1,0 +1,11 @@
+<templates>
+	<template>
+		<name>header.ftl</name>
+	</template>
+	<template>
+		<name>footer.ftl</name>
+	</template>
+	<template>
+		<name>body.ftl</name>
+	</template>
+</templates>

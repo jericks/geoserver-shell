@@ -1,0 +1,1 @@
+${STATE_NAME} has ${TOTAL_POP} total population
