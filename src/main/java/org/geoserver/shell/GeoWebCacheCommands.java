@@ -23,6 +23,10 @@ public class GeoWebCacheCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     // @TODO http://docs.geoserver.org/stable/en/user/geowebcache/rest/layers.html#layer-list has /gwc/rest/seed/layers
     // if should be /gwc/rest/layers
     @CliCommand(value = "gwc layer list", help = "List GeoWebCache Layers.")
@@ -264,7 +268,7 @@ public class GeoWebCacheCommands implements CommandMarker {
     }
 
     @CliCommand(value = "gwc layer delete", help = "Delete a GeoWebCache Layer.")
-    public boolean createWMSLayer(
+    public boolean deleteLayer(
             @CliOption(key = "name", mandatory = true, help = "The layer name") String name
     ) throws Exception {
         String url = geoserver.getUrl() + "/gwc/rest/layers/" + URLUtil.encode(name) + ".xml";

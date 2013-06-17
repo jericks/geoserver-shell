@@ -1,0 +1,22 @@
+<layers>
+	<layer>
+		<name>nurc:Arc_Sample</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/gwc/rest/layers/nurc%3AArc_Sample.xml" type="text/xml"/>
+	</layer>
+	<layer>
+		<name>nurc:Img_Sample</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/gwc/rest/layers/nurc%3AImg_Sample.xml" type="text/xml"/>
+	</layer>
+	<layer>
+		<name>nurc:Pk50095</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/gwc/rest/layers/nurc%3APk50095.xml" type="text/xml"/>
+	</layer>
+	<layer>
+		<name>nurc:mosaic</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/gwc/rest/layers/nurc%3Amosaic.xml" type="text/xml"/>
+	</layer>
+</layers>
