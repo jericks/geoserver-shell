@@ -145,7 +145,7 @@ public class FeatureTypeCommandsTest extends BaseTest {
                 "<name>name</name><binding>java.lang.String</binding></attribute><attribute>" +
                 "<name>id</name><binding>java.lang.Integer</binding></attribute></attributes>" +
                 "<srs>EPSG:4326</srs><title>Soils</title><description>Soil Survey Polygons</description>" +
-                "<keywords><keyword>soil</keyword><keyword> survey</keyword></keywords><enabled>true</enabled>" +
+                "<keywords><keyword>soil</keyword><keyword>survey</keyword></keywords><enabled>true</enabled>" +
                 "<advertised>true</advertised><maxFeatures>10000</maxFeatures>" +
                 "<numDecimals>5</numDecimals></featureType>";
         assertEquals(expected, actual);

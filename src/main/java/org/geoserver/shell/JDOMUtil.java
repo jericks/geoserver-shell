@@ -21,7 +21,7 @@ public class JDOMUtil {
     }
 
     public static String toString(Element element) {
-        XMLOutputter xmlOutputter = new XMLOutputter(Format.getRawFormat());
+        XMLOutputter xmlOutputter = new XMLOutputter(Format.getCompactFormat());
         return xmlOutputter.outputString(element);
     }
 }
