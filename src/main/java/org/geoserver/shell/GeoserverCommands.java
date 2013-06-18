@@ -13,6 +13,10 @@ public class GeoserverCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "geoserver set", help = "Set the url, user, and password for Geoserver.")
     public void set(
             @CliOption(key = "url", mandatory = true, help = "The url") String url,
