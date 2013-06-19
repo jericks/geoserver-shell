@@ -1,0 +1,40 @@
+<global>
+	<settings>
+		<id>SettingsInfoImpl-4e79191a:13f122c7efe:-8000</id>
+		<contact>
+			<addressCity>Somewhere</addressCity>
+			<addressCountry>USA</addressCountry>
+			<addressType>Home</addressType>
+			<contactEmail>somebody@somewhere.com</contactEmail>
+			<contactOrganization>Geoserver</contactOrganization>
+			<contactPerson>John Doe</contactPerson>
+			<contactPosition>Map Maker</contactPosition>
+		</contact>
+		<numDecimals>0</numDecimals>
+		<verbose>true</verbose>
+		<verboseExceptions>true</verboseExceptions>
+	</settings>
+	<jai>
+		<allowInterpolation>false</allowInterpolation>
+		<recycling>false</recycling>
+		<tilePriority>0</tilePriority>
+		<tileThreads>0</tileThreads>
+		<memoryCapacity>0.0</memoryCapacity>
+		<memoryThreshold>0.0</memoryThreshold>
+		<imageIOCache>false</imageIOCache>
+		<pngAcceleration>true</pngAcceleration>
+		<jpegAcceleration>true</jpegAcceleration>
+		<allowNativeMosaic>false</allowNativeMosaic>
+	</jai>
+	<coverageAccess>
+		<maxPoolSize>10</maxPoolSize>
+		<corePoolSize>5</corePoolSize>
+		<keepAliveTime>30000</keepAliveTime>
+		<queueType>UNBOUNDED</queueType>
+		<imageIOCacheThreshold>0</imageIOCacheThreshold>
+	</coverageAccess>
+	<updateSequence>245</updateSequence>
+	<featureTypeCacheSize>0</featureTypeCacheSize>
+	<globalServices>true</globalServices>
+	<xmlPostRequestLogBufferSize>1024</xmlPostRequestLogBufferSize>
+</global>

@@ -16,6 +16,10 @@ public class SettingsCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "settings list", help = "List settings.")
     public String list() throws Exception {
         String url = geoserver.getUrl() + "/rest/settings.xml";

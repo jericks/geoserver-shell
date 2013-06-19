@@ -1,0 +1,16 @@
+<settings>
+	<id>SettingsInfoImpl-4e79191a:13f122c7efe:-7ffc</id>
+	<workspace>
+		<name>topp</name>
+	</workspace>
+	<contact>
+		<id>contact</id>
+		<addressType>work</addressType>
+		<contactOrganization>Work</contactOrganization>
+		<contactPerson>John Doe</contactPerson>
+	</contact>
+	<charset>UTF-8</charset>
+	<numDecimals>4</numDecimals>
+	<verbose>false</verbose>
+	<verboseExceptions>false</verboseExceptions>
+</settings>

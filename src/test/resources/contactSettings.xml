@@ -1,0 +1,9 @@
+<contact>
+	<addressCity>Somewhere</addressCity>
+	<addressCountry>USA</addressCountry>
+	<addressType>Home</addressType>
+	<contactEmail>somebody@somewhere.com</contactEmail>
+	<contactOrganization>Geoserver</contactOrganization>
+	<contactPerson>John Doe</contactPerson>
+	<contactPosition>Map Maker</contactPosition>
+</contact>
