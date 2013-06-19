@@ -19,6 +19,10 @@ public class ShapefileCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "shapefile publish", help = "Publish a shapefile.")
     public boolean publish(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
