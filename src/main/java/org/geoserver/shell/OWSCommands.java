@@ -18,6 +18,10 @@ public class OWSCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "ows wcs list", help = "List Global or Local OWS WCS Settings.")
     public String wcsList(
             @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace
