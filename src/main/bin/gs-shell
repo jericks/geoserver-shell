@@ -1,0 +1,23 @@
+#!/bin/bash
+
+JAVA=""
+if [ "$JAVA_HOME" != "" ]; then
+  JAVA=$JAVA_HOME/bin/java
+else
+  which java > /dev/null
+  if [ "$?" == "1" ]; then
+    echo "JAVA_HOME is not defined, and java is not on the current PATH"
+    exit
+  fi
+  JAVA=`which java`
+fi
+
+LIBDIR=`dirname $0`/../lib
+LIBDIR=`cd $LIBDIR; pwd`
+
+if [ ! -e "$LIBDIR" ]; then
+  echo "The gs-shell lib directory not found"
+  exit
+fi
+
+"$JAVA" -jar $LIBDIR/geoserver-shell-1.0-SNAPSHOT.jar "$@"

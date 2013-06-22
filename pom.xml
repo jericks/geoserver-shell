@@ -83,7 +83,16 @@
 		</repository>
 	</repositories>
 	<build>
+        <finalName>gs-shell</finalName>
 		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -112,12 +121,31 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
+							<!--<classpathPrefix>lib/</classpathPrefix>-->
 							<mainClass>org.springframework.shell.Bootstrap</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
-			</plugin>
+            </plugin>
+             <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2.2</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/dir.xml</descriptor>
+                        <descriptor>src/main/assembly/zip.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 </project>
