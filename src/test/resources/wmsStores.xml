@@ -1,0 +1,10 @@
+<wmsStores>
+	<wmsStore>
+		<name>massgis</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate" href="http://localhost:8080/geoserver/rest/workspaces/topp/wmsstores/massgis.xml" type="application/xml"/>
+	</wmsStore>
+	<wmsStore>
+		<name>usgs</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate" href="http://localhost:8080/geoserver/rest/workspaces/topp/wmsstores/usgs.xml" type="application/xml"/>
+	</wmsStore>
+</wmsStores>

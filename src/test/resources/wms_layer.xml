@@ -1,0 +1,71 @@
+<wmsLayer>
+	<name>massgis:WELLS.WELLS_PT</name>
+	<nativeName>massgis:WELLS.WELLS_PT</nativeName>
+	<namespace>
+		<name>topp</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/namespaces/topp.xml" type="application/xml"/>
+	</namespace>
+	<title>DCR Well Points</title>
+	<description>Generated from webeditor_sde</description>
+	<abstract>Generated from webeditor_sde</abstract>
+	<keywords>
+		<string>WELLS.WELLS_PT</string>
+		<string>webeditor_sde</string>
+	</keywords>
+	<nativeCRS class="projected">PROJCS[&quot;NAD83 / Massachusetts Mainland&quot;,
+		GEOGCS[&quot;NAD83&quot;,
+		DATUM[&quot;North American Datum 1983&quot;,
+		SPHEROID[&quot;GRS 1980&quot;, 6378137.0, 298.257222101, AUTHORITY[&quot;EPSG&quot;,&quot;7019&quot;]],
+		TOWGS84[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+		AUTHORITY[&quot;EPSG&quot;,&quot;6269&quot;]],
+		PRIMEM[&quot;Greenwich&quot;, 0.0, AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]],
+		UNIT[&quot;degree&quot;, 0.017453292519943295],
+		AXIS[&quot;Geodetic longitude&quot;, EAST],
+		AXIS[&quot;Geodetic latitude&quot;, NORTH],
+		AUTHORITY[&quot;EPSG&quot;,&quot;4269&quot;]],
+		PROJECTION[&quot;Lambert_Conformal_Conic_2SP&quot;, AUTHORITY[&quot;EPSG&quot;,&quot;9802&quot;]],
+		PARAMETER[&quot;central_meridian&quot;, -71.5],
+		PARAMETER[&quot;latitude_of_origin&quot;, 41.0],
+		PARAMETER[&quot;standard_parallel_1&quot;, 42.68333333333334],
+		PARAMETER[&quot;false_easting&quot;, 200000.0],
+		PARAMETER[&quot;false_northing&quot;, 750000.0],
+		PARAMETER[&quot;scale_factor&quot;, 1.0],
+		PARAMETER[&quot;standard_parallel_2&quot;, 41.71666666666667],
+		UNIT[&quot;m&quot;, 1.0],
+		AXIS[&quot;Easting&quot;, EAST],
+		AXIS[&quot;Northing&quot;, NORTH],
+		AUTHORITY[&quot;EPSG&quot;,&quot;26986&quot;]]
+	</nativeCRS>
+	<srs>EPSG:26986</srs>
+	<nativeBoundingBox>
+		<minx>33863.73245999857</minx>
+		<maxx>330836.9724600009</maxx>
+		<miny>777606.3746099799</miny>
+		<maxy>959743.0446099902</maxy>
+		<crs class="projected">EPSG:26986</crs>
+	</nativeBoundingBox>
+	<latLonBoundingBox>
+		<minx>-73.53331821222113</minx>
+		<maxx>-69.89858964987232</maxx>
+		<miny>41.23116987753426</miny>
+		<maxy>42.88811062709496</maxy>
+		<crs>GEOGCS[&quot;WGS84(DD)&quot;,
+			DATUM[&quot;WGS84&quot;,
+			SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]],
+			PRIMEM[&quot;Greenwich&quot;, 0.0],
+			UNIT[&quot;degree&quot;, 0.017453292519943295],
+			AXIS[&quot;Geodetic longitude&quot;, EAST],
+			AXIS[&quot;Geodetic latitude&quot;, NORTH]]
+		</crs>
+	</latLonBoundingBox>
+	<projectionPolicy>FORCE_DECLARED</projectionPolicy>
+	<enabled>true</enabled>
+	<advertised>true</advertised>
+	<store class="wmsStore">
+		<name>massgis</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/workspaces/topp/wmsstores/massgis.xml"
+				   type="application/xml"/>
+	</store>
+</wmsLayer>

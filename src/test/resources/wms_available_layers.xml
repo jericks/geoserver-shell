@@ -1,0 +1,11 @@
+<list>
+	<wmsLayerName>massgis:AFREEMAN.AUDUBON_BIRD_S_V</wmsLayerName>
+	<wmsLayerName>massgis:AFREEMAN.AUDUBON_BUTTERFLY_S_V</wmsLayerName>
+	<wmsLayerName>massgis:AFREEMAN.AUDUBON_GRID_POLY</wmsLayerName>
+	<wmsLayerName>massgis:AFREEMAN.BLDGS_TEST_POLY</wmsLayerName>
+	<wmsLayerName>massgis:AFREEMAN.CAMPUS_BLDGS_POLY</wmsLayerName>
+	<wmsLayerName>massgis:AFREEMAN.CAMPUS_SITES_POLY</wmsLayerName>
+	<wmsLayerName>massgis:AFREEMAN.CPA_COMBINED_V_PT</wmsLayerName>
+	<wmsLayerName>massgis:AFREEMAN.CPA_PT</wmsLayerName>
+	<wmsLayerName>massgis:AFREEMAN.DCAM_BLDG_PTS_20120229</wmsLayerName>
+</list>

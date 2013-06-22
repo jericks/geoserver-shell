@@ -20,6 +20,10 @@ public class WmsStoreCommands implements CommandMarker {
     @Autowired
     private Geoserver geoserver;
 
+    public void setGeoserver(Geoserver gs) {
+        this.geoserver = gs;
+    }
+
     @CliCommand(value = "wmsstore list", help = "List WMS Stores.")
     public String listStores(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace
@@ -139,7 +143,7 @@ public class WmsStoreCommands implements CommandMarker {
     }
 
     @CliCommand(value = "wmsstore layer list", help = "List the Layers in a WMS Store.")
-    public String listLayers(
+    public String listPublishedLayers(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "store", mandatory = true, help = "The WMS Store") String store
     ) throws Exception {
@@ -160,7 +164,7 @@ public class WmsStoreCommands implements CommandMarker {
     }
 
     @CliCommand(value = "wmsstore available layer list", help = "List the available Layers in a WMS Store.")
-    public String listLayerNames(
+    public String listAvailableLayers(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "store", mandatory = true, help = "The WMS Store") String store
     ) throws Exception {
@@ -181,7 +185,7 @@ public class WmsStoreCommands implements CommandMarker {
     }
 
     @CliCommand(value = "wmsstore layer get", help = "List the Layers in a WMS Store.")
-    public String listStores(
+    public String getLayer(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "store", mandatory = true, help = "The WMS Store") String store,
             @CliOption(key = "layer", mandatory = true, help = "The WMS Layer") String layer

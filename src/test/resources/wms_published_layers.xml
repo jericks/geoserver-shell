@@ -1,0 +1,14 @@
+<wmsLayers>
+	<wmsLayer>
+		<name>massgis:WELLS.WELLS_PT</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/workspaces/topp/wmsstores/massgis/wmslayers/massgis%3AWELLS.WELLS_PT.xml"
+				   type="application/xml"/>
+	</wmsLayer>
+	<wmsLayer>
+		<name>massgis:GISDATA.BIKETRAILS_ARC</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/workspaces/topp/wmsstores/massgis/wmslayers/massgis%3ABIKETRAILS_ARC.xml"
+				   type="application/xml"/>
+	</wmsLayer>
+</wmsLayers>

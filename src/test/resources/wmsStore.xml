@@ -1,0 +1,25 @@
+<wmsStore>
+	<name>massgis</name>
+	<type>WMS</type>
+	<enabled>true</enabled>
+	<workspace>
+		<name>topp</name>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/workspaces/topp.xml" type="application/xml"/>
+	</workspace>
+	<metadata>
+		<entry key="useConnectionPooling">true</entry>
+	</metadata>
+	<__default>false</__default>
+	<capabilitiesURL>
+		http://giswebservices.massgis.state.ma.us/geoserver/wms?request=GetCapabilities&amp;version=1.1.0&amp;service=wms
+	</capabilitiesURL>
+	<maxConnections>6</maxConnections>
+	<readTimeout>60</readTimeout>
+	<connectTimeout>30</connectTimeout>
+	<wmsLayers>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="alternate"
+				   href="http://localhost:8080/geoserver/rest/workspaces/topp/wmsstores/massgis/wmslayers.xml"
+				   type="application/xml"/>
+	</wmsLayers>
+</wmsStore>
