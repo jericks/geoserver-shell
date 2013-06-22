@@ -24,12 +24,12 @@ public class GeoserverBannerProvider extends DefaultBannerProvider implements Co
 
     @Override
     public String getVersion() {
-        return "1.0.0";
+        return "0.1.0";
     }
 
     @Override
     public String getWelcomeMessage() {
-        return "Welcome to the Geoserver Shell CLI!";
+        return "Welcome to the Geoserver Shell!";
     }
 
     @Override
