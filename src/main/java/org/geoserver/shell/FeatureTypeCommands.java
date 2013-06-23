@@ -9,6 +9,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
@@ -26,6 +27,11 @@ public class FeatureTypeCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({"featuretype list", "featuretype get", "featuretype create", "featuretype modify", "featuretype delete"})
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     @CliCommand(value = "featuretype list", help = "List feature types.")

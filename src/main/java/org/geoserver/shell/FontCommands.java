@@ -5,6 +5,7 @@ import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import org.jdom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
@@ -22,6 +23,11 @@ public class FontCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({"font list"})
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     @CliCommand(value = "font list", help = "List fonts.")

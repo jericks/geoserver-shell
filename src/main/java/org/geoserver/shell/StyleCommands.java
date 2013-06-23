@@ -12,6 +12,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
@@ -31,6 +32,11 @@ public class StyleCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({"style list", "style get", "style sld get", "style delete", "style create", "style modify"})
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     @CliCommand(value = "style list", help = "List style.")

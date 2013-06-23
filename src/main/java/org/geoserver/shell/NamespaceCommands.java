@@ -8,6 +8,7 @@ import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import org.jdom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
@@ -25,6 +26,12 @@ public class NamespaceCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({"namespace list", "namespace get", "namespace create", "namespace modify",
+            "namespace delete", "namespace default get", "namespace default set"})
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     @CliCommand(value = "namespace list", help = "List namespaces.")

@@ -7,6 +7,7 @@ import it.geosolutions.geoserver.rest.decoder.RESTDataStoreList;
 import org.jdom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
@@ -26,6 +27,11 @@ public class DataStoreCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({"datastore list", "datastore get", "datastore create", "datastore modify", "datastore delete", "datastore upload"})
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     @CliCommand(value = "datastore list", help = "List data stores.")

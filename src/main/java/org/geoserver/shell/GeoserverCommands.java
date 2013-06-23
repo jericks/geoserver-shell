@@ -3,6 +3,7 @@ package org.geoserver.shell;
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,11 @@ public class GeoserverCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({"geoserver reset", "geoserver reload"})
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     @CliCommand(value = "geoserver set", help = "Set the url, user, and password for Geoserver.")

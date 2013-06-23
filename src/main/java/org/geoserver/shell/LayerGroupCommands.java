@@ -8,6 +8,7 @@ import it.geosolutions.geoserver.rest.decoder.RESTLayerList;
 import it.geosolutions.geoserver.rest.decoder.RESTPublishedList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
@@ -24,6 +25,13 @@ public class LayerGroupCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({"layer group list", "layer group get", "layer group create", "layer group modify",
+            "layer group delete"
+    })
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     @CliCommand(value = "layer group list", help = "List layer groups.")

@@ -17,6 +17,14 @@ public class Geoserver {
         this.password = password;
     }
 
+    public boolean isSet() {
+        if (this.url != null && this.user != null && this.password != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public String getUrl() {
         return url;
     }

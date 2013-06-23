@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
@@ -25,6 +26,14 @@ public class GeoWebCacheCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({"gwc layer list", "gwc layer get", "gwc geoserver layer create",
+            "gwc geoserver layer modify", "gwc wms layer create", "gwc wms layer modify", "gwc layer delete",
+            "gwc status", "gwc kill", "gwc seed", "gwc reseed", "gwc truncate"
+    })
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     // @TODO http://docs.geoserver.org/stable/en/user/geowebcache/rest/layers.html#layer-list has /gwc/rest/seed/layers

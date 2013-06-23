@@ -5,6 +5,7 @@ import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import org.jdom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
@@ -22,6 +23,14 @@ public class WmsStoreCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({"wmsstore list", "wmsstore create", "wmsstore modify", "wmsstore get", "wmsstore delete",
+            "wmsstore layer list", "wmsstore available layer list", "wmsstore layer get", "wmsstore layer create",
+            "wmsstore layer modify", "wmsstore layer delete"
+    })
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     @CliCommand(value = "wmsstore list", help = "List WMS Stores.")

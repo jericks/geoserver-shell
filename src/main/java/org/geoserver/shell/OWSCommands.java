@@ -5,6 +5,7 @@ import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import org.jdom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
@@ -20,6 +21,15 @@ public class OWSCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({
+            "ows wcs list", "ows wcs modify", "ows wcs create", "ows wcs delete",
+            "ows wms list", "ows wms modify", "ows wms create", "ows wms delete",
+            "ows wfs list", "ows wfs modify", "ows wfs create", "ows wfs delete"
+    })
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     @CliCommand(value = "ows wcs list", help = "List Global or Local OWS WCS Settings.")

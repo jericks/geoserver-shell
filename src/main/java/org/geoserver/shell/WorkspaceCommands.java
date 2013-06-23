@@ -9,6 +9,7 @@ import it.geosolutions.geoserver.rest.encoder.GSWorkspaceEncoder;
 import org.jdom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
@@ -25,6 +26,12 @@ public class WorkspaceCommands implements CommandMarker {
 
     public void setGeoserver(Geoserver gs) {
         this.geoserver = gs;
+    }
+
+    @CliAvailabilityIndicator({"workspace list", "workspace get", "workspace create", "workspace delete",
+            "workspace default get", "workspace default set"})
+    public boolean isCommandAvailable() {
+        return geoserver.isSet();
     }
 
     @CliCommand(value = "workspace list", help = "List workspaces.")
