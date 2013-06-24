@@ -15,7 +15,7 @@ Build the code::
 
 Run the geoserver-shell::
 
-    java -jar target/geoserver-shell-1.0-SNAPSHOT.jar
+    target/gs-shell-app/gs-shell-1.0-SNAPSHOT/bin/gs-shell
 
 Enter commands::
 
