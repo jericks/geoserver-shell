@@ -79,6 +79,36 @@ Commands
 
     * manifest get
 
+* workspace
+
+    * workspace list
+
+    * workspace create --name test
+
+    * workspace get --name test
+
+    * workspace delete --name test
+
+    * workspace default get
+
+    * workspace default set --name test
+
+* namespace
+
+    * namespace list
+
+    * namespace create --prefix test --uri test.com
+
+    * namespace get --prefix test
+
+    * namespace modify --prefix test --uri test2.com
+
+    * namespace delete --prefix test --recurse true
+
+    * namespace default get
+
+    * namespace default set --prefix test
+
 Libraries
 ---------
 Spring Shell:
