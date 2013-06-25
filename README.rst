@@ -1,8 +1,12 @@
 GeoServer Shell
 ===============
-GeoServer Shell uses the spring-shell library used by Spring Roo to manage Geoserver.
+GeoServer Shell uses the spring-shell library used by Spring Roo to manage Geoserver in a command line interface (CLI).
 
-Usage
+You can use Geoserver Shell interactively by typing **gs-shell** at the command line
+or you can write scripts and then execute the from the command line by typing **gs-shell --cmdfile script.gs**
+or by using the **script --file script.gs** command within a Geoserver Shell session.
+
+Build
 -----
 
 Clone the repository::
@@ -17,7 +21,10 @@ Run the geoserver-shell::
 
     target/gs-shell-app/gs-shell-1.0-SNAPSHOT/bin/gs-shell
 
-Enter commands::
+Usage
+-----
+
+Create a Workspace::
 
     gs-shell>geoserver set --url http://localhost:8080/geoserver --user admin --password geoserver
 
@@ -59,6 +66,9 @@ Spring Shell:
 
 GeoServer Manager:
     https://github.com/geosolutions-it/geoserver-manager
+
+GeoTools:
+    http://www.geotools.org/
 
 License
 -------
