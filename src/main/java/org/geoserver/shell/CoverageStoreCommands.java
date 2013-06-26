@@ -143,12 +143,16 @@ public class CoverageStoreCommands implements CommandMarker {
         String contentType;
         if (type.equalsIgnoreCase("geotiff")) {
             contentType = "image/tiff";
-        } else if (type.equalsIgnoreCase("worldimage")) {
-            contentType = "image/" + file.getName().substring(file.getName().lastIndexOf("."));
         } else {
             contentType = "application/zip";
         }
         String response = HTTPUtils.put(url, file, contentType, geoserver.getUser(), geoserver.getPassword());
+        if (geoserver.isVerbose()) {
+            System.out.println("URL: " + url);
+            System.out.println("Content Type: " + contentType);
+            System.out.println("File: " + file.getAbsolutePath());
+            System.out.println("Response: " + response);
+        }
         return response != null;
     }
 }
