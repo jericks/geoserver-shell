@@ -8,6 +8,8 @@ public class Geoserver {
 
     private String password;
 
+    private boolean verbose = false;
+
     public Geoserver() {
     }
 
@@ -47,5 +49,13 @@ public class Geoserver {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
     }
 }

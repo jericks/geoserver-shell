@@ -11,6 +11,7 @@ import static com.xebialabs.restito.semantics.Action.status;
 import static com.xebialabs.restito.semantics.Action.stringContent;
 import static com.xebialabs.restito.semantics.Condition.*;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 public class GeoserverCommandsTest extends BaseTest {
@@ -41,6 +42,16 @@ public class GeoserverCommandsTest extends BaseTest {
         String expected = "http://localhost:8080/geoserver admin geoserver";
         String actual = commands.show();
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void setVerbose() {
+        Geoserver gs = new Geoserver();
+        GeoserverCommands commands = new GeoserverCommands();
+        commands.setGeoserver(gs);
+        assertFalse(gs.isVerbose());
+        assertTrue(commands.verbose(true));
+        assertTrue(gs.isVerbose());
     }
 
     @Test

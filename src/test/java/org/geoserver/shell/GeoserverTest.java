@@ -1,8 +1,8 @@
 package org.geoserver.shell;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class GeoserverTest {
 
@@ -12,6 +12,7 @@ public class GeoserverTest {
         assertNull(gs.getUrl());
         assertNull(gs.getUser());
         assertNull(gs.getPassword());
+        assertFalse(gs.isVerbose());
 
         gs.setUrl("http://localhost:8080/geoserver");
         assertEquals("http://localhost:8080/geoserver", gs.getUrl());
@@ -19,11 +20,14 @@ public class GeoserverTest {
         assertEquals("admin", gs.getUser());
         gs.setPassword("geoserver");
         assertEquals("geoserver", gs.getPassword());
+        gs.setVerbose(true);
+        assertTrue(gs.isVerbose());
 
         gs = new Geoserver("http://localhost:8080/geoserver", "admin", "geoserver");
         assertEquals("http://localhost:8080/geoserver", gs.getUrl());
         assertEquals("admin", gs.getUser());
         assertEquals("geoserver", gs.getPassword());
+        assertFalse(gs.isVerbose());
     }
 
 }

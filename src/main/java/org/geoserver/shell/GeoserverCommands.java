@@ -34,6 +34,12 @@ public class GeoserverCommands implements CommandMarker {
         geoserver.setPassword(password);
     }
 
+    @CliCommand(value = "geoserver verbose set", help = "Show the url, user, and password for Geoserver.")
+    public boolean verbose(@CliOption(key = "value", mandatory = true, help = "The verbosity value") boolean verbose) {
+        geoserver.setVerbose(verbose);
+        return true;
+    }
+
     @CliCommand(value = "geoserver show", help = "Show the url, user, and password for Geoserver.")
     public String show() {
         return geoserver.getUrl() + " " + geoserver.getUser() + " " + geoserver.getPassword();
