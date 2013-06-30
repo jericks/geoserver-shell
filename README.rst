@@ -109,6 +109,230 @@ Commands
 
     * namespace default set --prefix test
 
+* style
+
+    * style list
+
+    * style list --workspace topp
+
+    * style get --name line
+
+    * style sld get --name line
+
+    * style sld get --name line --file line.sld
+
+    * style create --name new_line --file line.sld
+
+    * style modify --name new_line --file line.sld
+
+    * style delete --name new_line
+
+* template
+
+    * template add --file title.ftl --workspace topp --datastore states_shapefile --featuretype states --name title
+
+    * template list --workspace topp --datastore states_shapefile --featuretype states
+
+    * template get --name title.ftl --workspace topp --datastore states_shapefile --featuretype states
+
+    * template get --name title.ftl --workspace topp --datastore states_shapefile --featuretype states --file new_title.ftl
+
+    * template modify --file title.ftl --workspace topp --datastore states_shapefile --featuretype states --name title
+
+    * template delete --name title.ftl --workspace topp --datastore states_shapefile --featuretype states
+
+* font
+
+    * font list
+
+    * font list --search Arial
+
+* datastore
+    
+    * datastore list --workspace topp
+
+    * datastore get --workspace topp --name taz_shapes
+
+    * datastore create --workspace topp --name h2test --connectionParams "dbtype=h2 database=test.db"
+    
+    * datastore modify --workspace topp --name h2test --description Testing
+
+    * datastore delete --workspace topp --name h2test --recurse false
+    
+    * datastore upload --workspace topp --name states_convexhull --type shp --file states_convexhull.zip
+
+* shapefile
+
+    * shapefile zip --shapefile states_voronoi.shp --zipfile states_voronoi.zip
+
+    * shapefile publish --workspace topp --datastore states_voronoi --layer states_voronoi --file states_voronoi.zip
+
+* featuretype
+
+    * featuretype list topp --datastore taz_shapes
+
+    * featuretype get --workspace topp --datastore taz_shapes --featuretype tasmania_cities
+
+    * featuretype create --workspace topp --datastore taz_shapes --featuretype taz_hydro --schema "the_geom:LineString:srid=4326,name:String,id:int"
+
+    * featuretype modify --workspace topp --datastore taz_shapes --featuretype taz_hydro --name "Tazmania Hydro Lines"
+
+    * featuretype delete --workspace topp --datastore taz_shapes --featuretype taz_hydro --recurse true
+
+* coverage stores
+
+    * coverage store list --workspace nurc
+      
+    * coverage store get --workspace nurc --coveragestore mosaic
+
+    * coverage store upload --workspace nurc --coveragestore test --file alki.tif --type geotiff
+
+    * coverage store delete --workspace nurc --coveragestore test --recurse true
+
+    * coverage store create --workspace nurc --name raster --type GeoTiff --url file:coverages/raster/raster.tif
+
+    * coverage store modify --workspace nurc --coveragestore raster --enabled false
+    
+* coverage
+  
+    * coverage list --workspace nurd --coveragestore mosaic
+
+    * coverage get --workspace nurc --coveragestore mosaic --coverage mosaic
+
+    * coverage create --workspace nurc --coveragestore worldImageSample --coverage test
+
+    * coverage delete --workspace nurc --coveragestore worldImageSample --coverage test --recurse true
+
+    * coverage modify --workspace nurc --coveragestore raster --coverage raster --title "My Raster"
+
+* worldimage
+
+    * worldimage zip --file NaturalEarth/MediumScale/GRAY_50M_SR_OB/GRAY_50M_SR_OB.tif
+
+    * worldimage publish --file GRAY_50M_SR_OB/GRAY_50M_SR_OB.zip --workspace naturalearth --coveragestore myworld --coverage test
+
+* layers
+
+    * layer list
+
+    * layer get --name states
+
+    * layer modify --name states --title "United States"
+
+    * layer delete --name states
+    
+    * layer style list --name states
+    
+    * layer style add --name states --style line
+
+* ows
+  
+    * ows wcs list
+
+    * ows wms list
+
+    * ows wfs list
+
+* ows wcs
+
+    * ows wcs list --workspace topp
+
+    * ows wcs create --workspace nurc
+
+    * ows wcs modify --workspace nurc --enabled false
+      
+    * ows wcs delete --workspace topp
+
+* ows wfs
+
+    * ows wfs create --workspace topp
+
+    * ows wfs list --workspace topp
+
+    * ows wfs modify --workspace topp --enabled false
+
+    * ows wfs delete --workspace topp
+
+* ows wms 
+
+    * ows wms create --workspace topp
+
+    * ows wms list --workspace topp
+
+    * ows wms modify --workspace topp --enabled false
+
+    * ows wms delete --workspace topp
+
+* settings
+
+    * settings list
+
+    * settings modify --person Jared
+
+    * settings contact list
+
+    * settings contact modify --city Tacoma
+
+    * settings local list --workspace topp
+
+    * settings local delete --workspace topp
+
+    * settings local create --workspace topp
+
+    * settings local modify --workspace topp --person "Jared Erickson"
+   
+* gwc
+    
+    * gwc layer list
+
+    * gwc layer get --name topp:states
+
+    * gwc wms layer create --name wms_states --wmsurl http://localhost:8080/geoserver/wms --wmslayers topp:states
+
+    * gwc geoserver layer create --name topp:states
+
+    * gwc layer delete --name test
+
+    * gwc wms layer modify --name topp:AFREEMAN.TOWNS_ANF2 --gutter 20
+
+    * gwc geoserver layer modify --name topp:states --enabled false
+
+    * gwc status
+
+    * gwc seed --name topp:states_voronoi --gridset EPSG:4326 --start 0 --stop 4
+
+    * gwc status --name top:states_voronoi
+      
+    * gwc reseed --name topp:states_voronoi --gridset EPSG:4326 --start 0 --stop 4
+
+    * gwc truncate --name topp:states_voronoi --gridset EPSG:4326 --start 0 --stop 4
+
+    * gwc kill
+
+* wmsstore
+
+    * wmsstore list --workspace topp
+
+    * wmsstore get --workspace topp --store massgis
+
+    * wmsstore create --workspace topp --store massgis --url http://giswebservices.massgis.state.ma.us/geoserver/wms?request=GetCapabilities&version=1.1.0&service=wms
+
+    * wmsstore modify --workspace topp --store massgis --enabled false
+
+    * wmsstore delete --workspace topp --store massgis --recurse true
+
+    * wmsstore layer list --workspace topp --store massgis
+
+    * wmsstore available layer list --workspace topp --store massgis
+
+    * wmsstore layer get --workspace topp --store massgis --layer AFREEMAN.TOWNS_ANF2
+
+    * wmsstore layer create --workspace top --store massgis --layer massgis:GISDATA.BIKETRAILS_ARC
+
+    * wmsstore layer modify --workspace topp --store massgis --layer massgis:WELLS.WELLS_PT --enabled false
+      
+    * wmsstore layer delete --workspace topp --store massgis --layer massgis:WELLS.WELLS_PT --recurse true
+
 Libraries
 ---------
 Spring Shell:
