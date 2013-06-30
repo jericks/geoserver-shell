@@ -1,6 +1,10 @@
 GeoServer Shell
 ===============
-GeoServer Shell uses the spring-shell library used by Spring Roo to manage Geoserver in a command line interface (CLI).
+Administer Geoserver using a command line interface (CLI).  Geoserver Shell uses the same shell interface used by Spring Roo and
+provides extensive tab completion, history support, and the ability to run scripts.
+
+Geserver Shell administers Geoserver using the excellent Geoserver Rest API.  You can publish shapefiles, GeoTIFFs, and PostGIS layers,
+upload and download SLDs, and start tile seeding straight from the command line.
 
 You can use Geoserver Shell interactively by typing **gs-shell** at the command line
 or you can write scripts and then execute them from the command line by typing **gs-shell --cmdfile script.gs**
@@ -21,8 +25,8 @@ Run the geoserver-shell::
 
     target/gs-shell-app/gs-shell-1.0-SNAPSHOT/bin/gs-shell
 
-Usage
------
+Examples
+--------
 
 Create a Workspace::
 
@@ -61,6 +65,25 @@ Start seeding tiles::
 
 Commands
 --------
+
+* built ins
+
+    * exit = exit the shell
+
+    * quit = exit the shell
+
+    * help = list all commands and their usages
+
+    * ! = run os command string
+
+    * date = displays local date and time
+
+    * script = run a script
+
+    * system properties = show shell's properties
+
+    * version = display current cli version
+
 * geoserver
 
     * geoserver set --url http://localhost:8080/geoserver --user admin --password geoserver
