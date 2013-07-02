@@ -6,12 +6,14 @@ import org.glassfish.grizzly.http.util.HttpStatus;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.List;
 
 import static com.xebialabs.restito.builder.stub.StubHttp.whenHttp;
 import static com.xebialabs.restito.builder.verify.VerifyHttp.verifyHttp;
 import static com.xebialabs.restito.semantics.Action.status;
 import static com.xebialabs.restito.semantics.Action.stringContent;
 import static com.xebialabs.restito.semantics.Condition.*;
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 public class ShapefilesCommandsTest extends BaseTest {
@@ -40,5 +42,12 @@ public class ShapefilesCommandsTest extends BaseTest {
         File zipFile = File.createTempFile("points",".zip");
         boolean result = commands.zip(file, zipFile);
         assertTrue(result);
+        List<String> names = getFileNamesFromZip(zipFile);
+        assertEquals(5, names.size());
+        assertTrue(names.contains("points.shp"));
+        assertTrue(names.contains("points.dbf"));
+        assertTrue(names.contains("points.prj"));
+        assertTrue(names.contains("points.shx"));
+        assertTrue(names.contains("points.fix"));
     }
 }
