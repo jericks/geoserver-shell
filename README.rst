@@ -94,6 +94,10 @@ Commands
 
     * geoserver reset
 
+    * geoserver backup --directory backup1 --includedata false --includegwc false --includelog true
+
+    * geoserver restore --directory backup1
+
 * about
 
     * version list

@@ -77,4 +77,35 @@ public class GeoserverCommandsTest extends BaseTest {
         assertTrue(result);
         verifyHttp(server).once(method(Method.POST), uri(url));
     }
+
+    @Test
+    public void backup() throws Exception {
+        String url = "/geoserver/rest/bkprst/backup";
+        whenHttp(server).match(post(url)).then(stringContent("true"), status(HttpStatus.OK_200));
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        GeoserverCommands commands = new GeoserverCommands();
+        commands.setGeoserver(geoserver);
+        boolean result = commands.backup("backupdir1", true, true, false);
+        assertTrue(result);
+        String expected = "<task><path>backupdir1</path><includedata>true</includedata><includegwc>true</includegwc><includelog>false</includelog></task>";
+        String actual = server.getCalls().get(0).getPostBody();
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.POST), uri(url));
+    }
+
+    @Test
+    public void restore() throws Exception {
+        String url = "/geoserver/rest/bkprst/restore";
+        whenHttp(server).match(post(url)).then(stringContent("true"), status(HttpStatus.OK_200));
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        GeoserverCommands commands = new GeoserverCommands();
+        commands.setGeoserver(geoserver);
+        boolean result = commands.restore("backupdir1");
+        assertTrue(result);
+        String expected = "<task><path>backupdir1</path></task>";
+        String actual = server.getCalls().get(0).getPostBody();
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.POST), uri(url));
+    }
+
 }
