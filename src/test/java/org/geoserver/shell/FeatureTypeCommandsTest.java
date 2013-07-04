@@ -116,6 +116,24 @@ public class FeatureTypeCommandsTest extends BaseTest {
     }
 
     @Test
+    public void publishFeatureType() throws Exception {
+        String url = "/geoserver/rest/workspaces/topp/datastores/taz_shapes/featuretypes.xml";
+        whenHttp(server).match(post(url)).then(stringContent(getResourceString("featuretypes.xml")), status(HttpStatus.OK_200));
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        FeatureTypeCommands commands = new FeatureTypeCommands();
+        commands.setGeoserver(geoserver);
+        String workspace = "topp";
+        String dataStore = "taz_shapes";
+        String featureType = "taz_soils";
+        boolean result = commands.publish(workspace, dataStore, featureType);
+        assertTrue(result);
+        String actual = server.getCalls().get(0).getPostBody();
+        String expected = "<featureType><name>taz_soils</name></featureType>";
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.POST), uri(url));
+    }
+
+    @Test
     public void createFeatureType() throws Exception {
         String url = "/geoserver/rest/workspaces/topp/datastores/taz_shapes/featuretypes.xml";
         whenHttp(server).match(post(url)).then(stringContent(getResourceString("featuretypes.xml")), status(HttpStatus.OK_200));

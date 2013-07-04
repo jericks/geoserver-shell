@@ -55,7 +55,21 @@ public class FeatureTypeCommands implements CommandMarker {
         return builder.toString();
     }
 
-    @CliCommand(value = "featuretype create", help = "Create a feature type.")
+    @CliCommand(value = "featuretype publish", help = "Publish a feature type from an existing dataset.")
+    public boolean publish(
+            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
+            @CliOption(key = "datastore", mandatory = true, help = "The datastore") String datastore,
+            @CliOption(key = "featuretype", mandatory = true, help = "The featuretype") String featuretype
+    ) throws Exception {
+        Element rootElement = new Element("featureType");
+        rootElement.addContent(new Element("name").setText(featuretype));
+        String xml = JDOMUtil.toString(rootElement);
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes.xml";
+        String response = HTTPUtils.postXml(url, xml, geoserver.getUser(), geoserver.getPassword());
+        return response != null;
+    }
+
+    @CliCommand(value = "featuretype create", help = "Create a new feature type.")
     public boolean create(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
             @CliOption(key = "datastore", mandatory = true, help = "The datastore") String datastore,
