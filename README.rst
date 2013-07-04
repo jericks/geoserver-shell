@@ -194,11 +194,19 @@ Commands
 
     * shapefile publish --workspace topp --datastore states_voronoi --layer states_voronoi --file states_voronoi.zip
 
+* postgis
+
+    * postgis datastore create --workspace topp --datastore postgis --host localhost --port 5432 --database postgis --schema public --user uzer --password pass
+
+    * postgis featuretype publish --workspace topp --datastore postgis --table world_boundaries
+
 * featuretype
 
     * featuretype list topp --datastore taz_shapes
 
     * featuretype get --workspace topp --datastore taz_shapes --featuretype tasmania_cities
+
+    * featuretype publish --workspace postgis --datastore tables --featuretype table
 
     * featuretype create --workspace topp --datastore taz_shapes --featuretype taz_hydro --schema "the_geom:LineString:srid=4326,name:String,id:int"
 
