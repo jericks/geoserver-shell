@@ -37,15 +37,23 @@ public class FeatureTypeCommands implements CommandMarker {
     @CliCommand(value = "featuretype list", help = "List feature types.")
     public String list(
             @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
-            @CliOption(key = "datastore", mandatory = true, help = "The datastore") String datastore
+            @CliOption(key = "datastore", mandatory = true, help = "The datastore") String datastore,
+            @CliOption(key = "list", mandatory = false, unspecifiedDefaultValue = "configured", help = "The list parameter (configured, available, available_with_geom, all)") String list
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes.xml";
+        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes.xml?list=" + list;
         String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         Element element = JDOMBuilder.buildElement(xml);
-        List<Element> elements = element.getChildren("featureType");
         List<String> names = new ArrayList<String>();
-        for (Element elem : elements) {
-            names.add(elem.getChildText("name"));
+        if (element.getName().equalsIgnoreCase("featureTypes")) {
+            List<Element> elements = element.getChildren("featureType");
+            for (Element elem : elements) {
+                names.add(elem.getChildText("name"));
+            }
+        } else {
+            List<Element> elements = element.getChildren("featureTypeName");
+            for (Element elem : elements) {
+                names.add(elem.getTextTrim());
+            }
         }
         Collections.sort(names);
         StringBuilder builder = new StringBuilder();

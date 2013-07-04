@@ -22,9 +22,10 @@ public class FeatureTypeCommandsTest extends BaseTest {
         Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
         FeatureTypeCommands commands = new FeatureTypeCommands();
         commands.setGeoserver(geoserver);
-        String actual = commands.list("topp", "taz_shapes");
+        String actual = commands.list("topp", "taz_shapes", "configured");
         String expected = "tasmania_cities" + OsUtils.LINE_SEPARATOR + "tasmania_hydro" + OsUtils.LINE_SEPARATOR + "tasmania_parcels" + OsUtils.LINE_SEPARATOR;
         assertEquals(expected, actual);
+        assertEquals("configured", server.getCalls().get(0).getParameters().get("list")[0]);
         verifyHttp(server).once(method(Method.GET), uri(url));
     }
 

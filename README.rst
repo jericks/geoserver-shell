@@ -204,6 +204,8 @@ Commands
 
     * featuretype list topp --datastore taz_shapes
 
+    * featuretype list --workspace post --datastore postgis --list available
+
     * featuretype get --workspace topp --datastore taz_shapes --featuretype tasmania_cities
 
     * featuretype publish --workspace postgis --datastore tables --featuretype table
