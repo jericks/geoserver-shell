@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.geoserver</groupId>
 	<artifactId>geoserver-shell</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>0.1</version>
 	<packaging>jar</packaging>
 	<name>geoserver-shell</name>
 	<url>http://maven.apache.org</url>
@@ -100,33 +100,12 @@
             </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.1</version>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<overWriteReleases>true</overWriteReleases>
-							<overWriteSnapshots>true</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.1</version>
 				<configuration>
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<!--<classpathPrefix>lib/</classpathPrefix>-->
 							<mainClass>org.springframework.shell.Bootstrap</mainClass>
 						</manifest>
 					</archive>
