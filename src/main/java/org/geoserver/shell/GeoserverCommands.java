@@ -20,7 +20,8 @@ public class GeoserverCommands implements CommandMarker {
         this.geoserver = gs;
     }
 
-    @CliAvailabilityIndicator({"geoserver reset", "geoserver reload", "geoserver backup"})
+    @CliAvailabilityIndicator({"geoserver reset", "geoserver reload", "geoserver backup",
+            "geoserver restore", "geoserver verbose set", "geoserver show"})
     public boolean isCommandAvailable() {
         return geoserver.isSet();
     }

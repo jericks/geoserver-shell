@@ -29,7 +29,7 @@ public class FeatureTypeCommands implements CommandMarker {
         this.geoserver = gs;
     }
 
-    @CliAvailabilityIndicator({"featuretype list", "featuretype get", "featuretype create", "featuretype modify", "featuretype delete"})
+    @CliAvailabilityIndicator({"featuretype list", "featuretype publish", "featuretype get", "featuretype create", "featuretype modify", "featuretype delete"})
     public boolean isCommandAvailable() {
         return geoserver.isSet();
     }
