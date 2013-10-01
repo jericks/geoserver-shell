@@ -10,7 +10,7 @@
   <fileSets>
       <fileSet>
           <outputDirectory>/</outputDirectory>
-          <directory>${basedir}/target/gs-shell-app/gs-shell-${project.version}</directory>
+          <directory>${basedir}/target/geoserver-shell-${project.version}-app/gs-shell-${project.version}</directory>
           <includes>
               <include>README.rst</include>
               <include>LICENSE</include>
