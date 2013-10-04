@@ -1,6 +1,7 @@
 package org.geoserver.shell;
 
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -8,7 +9,10 @@ import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URL;
 
 @Component
 public class GeoserverCommands implements CommandMarker {
@@ -21,7 +25,9 @@ public class GeoserverCommands implements CommandMarker {
     }
 
     @CliAvailabilityIndicator({"geoserver reset", "geoserver reload", "geoserver backup",
-            "geoserver restore", "geoserver verbose set", "geoserver show"})
+            "geoserver restore", "geoserver verbose set", "geoserver show", "geoserver getmap",
+            "geoserver getfeature"
+    })
     public boolean isCommandAvailable() {
         return geoserver.isSet();
     }
@@ -79,5 +85,87 @@ public class GeoserverCommands implements CommandMarker {
         GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         String result = publisher.restore(backupDir);
         return result != null;
+    }
+
+    @CliCommand(value = "geoserver getmap", help = "Get a map from the WMS service.")
+    public String getMap(
+            @CliOption(key = "layers", mandatory = true, help = "The layers to display") String layers,
+            @CliOption(key = "file", mandatory = false, unspecifiedDefaultValue = "map.png", help = "The file name") String fileName,
+            @CliOption(key = "width", mandatory = false, help = "The width") String width,
+            @CliOption(key = "height", mandatory = false, help = "The height") String height,
+            @CliOption(key = "format", mandatory = false, help = "The format") String format,
+            @CliOption(key = "srs", mandatory = false, help = "The srs") String srs,
+            @CliOption(key = "bbox", mandatory = false, help = "The bbox") String bbox
+    ) throws Exception {
+        String url = geoserver.getUrl() + "/wms/reflect?layers=" + URLUtil.encode(layers);
+        if (width != null) {
+            url += "&width=" + width;
+        }
+        if (height != null) {
+            url += "&height=" + height;
+        }
+        if (srs != null) {
+            url += "&srs=" + srs;
+        }
+        if (bbox != null) {
+            url += "&bbox=" + bbox;
+        }
+        String formatMimeType = "image/png";
+        String formatImageIO = "png";
+        if (format != null) {
+            if (format.equalsIgnoreCase("jpeg") || format.equalsIgnoreCase("jpg")
+                    || format.equalsIgnoreCase("image/jpeg") || format.equalsIgnoreCase("image/jpg")) {
+                formatMimeType = "image/jpeg";
+                formatImageIO = "jpeg";
+            }
+            url += "&format=" + formatMimeType;
+        }
+        String message = fileName;
+        BufferedImage image = ImageIO.read(new URL(url));
+        if (image != null) {
+            ImageIO.write(image, formatImageIO, new File(fileName));
+        } else {
+            message = "Unable to read URL (" + url + ")";
+        }
+        return message;
+    }
+
+    @CliCommand(value = "geoserver getfeature", help = "Get features from the WMF service.")
+    public String getFeature(
+            @CliOption(key = "typeName", mandatory = true, help = "The type name to query") String typeName,
+            @CliOption(key = "version", unspecifiedDefaultValue = "1.0.0", mandatory = false, help = "The version") String version,
+            @CliOption(key = "maxfeatures", mandatory = false, help = "The version") String maxFeatures,
+            @CliOption(key = "sortby", mandatory = false, help = "The version") String sortBy,
+            @CliOption(key = "propertyname", mandatory = false, help = "The version") String propertyName,
+            @CliOption(key = "featureid", mandatory = false, help = "The version") String featureID,
+            @CliOption(key = "bbox", mandatory = false, help = "The version") String bbox,
+            @CliOption(key = "srs", mandatory = false, help = "The version") String srsName,
+            @CliOption(key = "format", unspecifiedDefaultValue = "csv", mandatory = false, help = "The version") String outputFormat,
+            @CliOption(key = "cql", mandatory = false, help = "The CQL query") String cql
+    ) throws Exception {
+        String url = geoserver.getUrl() + "/wfs?service=wfs&version=" + version + "&request=GetFeature&typeName=" + URLUtil.encode(typeName);
+        url += "&outputFormat=" + outputFormat;
+        if (maxFeatures != null) {
+            url += "&maxFeatures=" + maxFeatures;
+        }
+        if (sortBy != null) {
+            url += "&sortBy=" + sortBy;
+        }
+        if (propertyName != null) {
+            url += "&propertyName=" + propertyName;
+        }
+        if (featureID != null) {
+            url += "&featureID=" + featureID;
+        }
+        if (bbox != null) {
+            url += "&bbox=" + bbox;
+        }
+        if (srsName != null) {
+            url += "&srsName=" + srsName;
+        }
+        if (cql != null) {
+            url += "&cql_filter=" + cql;
+        }
+        return IOUtils.toString(new URL(url));
     }
 }

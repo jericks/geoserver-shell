@@ -63,6 +63,16 @@ Start seeding tiles::
 
     gs-shell>gwc seed --name naturalearth:110m_admin_0_countries --gridset EPSG:4326 --start 0 --stop 4
 
+Preview a newly uploaded layer::
+
+    gs-shell>geoserver getmap --layers states
+    map.png
+    gs-shell>! open map.png
+
+    gs-shell>geoserver getfeature --typeName topp:states --propertyname STATE_NAME --featureid states.49
+    FID,STATE_NAME
+    states.49,Washington
+
 Commands
 --------
 
@@ -97,6 +107,10 @@ Commands
     * geoserver backup --directory backup1 --includedata false --includegwc false --includelog true
 
     * geoserver restore --directory backup1
+
+    * geoserver getmap --layers states
+
+    * geoserver getfeature --typeName topp:states
 
 * about
 

@@ -1,18 +1,26 @@
 package org.geoserver.shell;
 
+import com.google.common.base.Function;
+import com.google.common.io.Resources;
+import com.xebialabs.restito.semantics.Action;
+import com.xebialabs.restito.semantics.Applicable;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
 import org.glassfish.grizzly.http.Method;
+import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.junit.Test;
 import org.springframework.shell.support.util.OsUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
 import static com.xebialabs.restito.builder.stub.StubHttp.whenHttp;
 import static com.xebialabs.restito.builder.verify.VerifyHttp.verifyHttp;
-import static com.xebialabs.restito.semantics.Action.status;
-import static com.xebialabs.restito.semantics.Action.stringContent;
+import static com.xebialabs.restito.semantics.Action.*;
 import static com.xebialabs.restito.semantics.Condition.*;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 public class GeoserverCommandsTest extends BaseTest {
 
@@ -106,6 +114,55 @@ public class GeoserverCommandsTest extends BaseTest {
         String actual = server.getCalls().get(0).getPostBody();
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.POST), uri(url));
+    }
+
+    @Test
+    public void getMap() throws Exception {
+        String url = "/geoserver/wms/reflect";
+        whenHttp(server).match(get(url)).then(custom(new Function<Response, Response>() {
+            @Override
+            public Response apply(Response r) {
+                URL url = Resources.getResource("map.png");
+                try {
+                    r.getOutputStream().write(Resources.toByteArray(url));
+                } catch (IOException e) {
+                    System.err.println("Unable to read map.png!");
+                }
+                r.setContentType("image/png");
+                return r;
+            }
+        }), status(HttpStatus.OK_200));
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        GeoserverCommands commands = new GeoserverCommands();
+        commands.setGeoserver(geoserver);
+        String result = commands.getMap("states", "map.png", null, null, null, null, null);
+        assertEquals("map.png", result);
+        assertEquals("states", server.getCalls().get(0).getParameters().get("layers")[0]);
+        verifyHttp(server).once(method(Method.GET), uri(url));
+    }
+
+    @Test
+    public void getFeature() throws Exception {
+        String url = "/geoserver/wfs";
+        whenHttp(server).match(get(url)).then(resourceContent("points.csv"), status(HttpStatus.OK_200));
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        GeoserverCommands commands = new GeoserverCommands();
+        commands.setGeoserver(geoserver);
+        String result = commands.getFeature("topp:states", "1.0.0", null, null, null, null, null, null, "csv", null);
+        assertNotNull(result);
+        String expected = IOUtils.toString(Resources.getResource("points.csv"));
+        assertEquals(expected, result);
+        assertEquals("topp:states", server.getCalls().get(0).getParameters().get("typeName")[0]);
+        assertEquals("1.0.0", server.getCalls().get(0).getParameters().get("version")[0]);
+        assertEquals("csv", server.getCalls().get(0).getParameters().get("outputFormat")[0]);
+        assertNull(server.getCalls().get(0).getParameters().get("maxFeatures"));
+        assertNull(server.getCalls().get(0).getParameters().get("sortBy"));
+        assertNull(server.getCalls().get(0).getParameters().get("propertyName"));
+        assertNull(server.getCalls().get(0).getParameters().get("featureID"));
+        assertNull(server.getCalls().get(0).getParameters().get("bbox"));
+        assertNull(server.getCalls().get(0).getParameters().get("srsName"));
+        assertNull(server.getCalls().get(0).getParameters().get("cql_filter"));
+        verifyHttp(server).once(method(Method.GET), uri(url));
     }
 
 }
