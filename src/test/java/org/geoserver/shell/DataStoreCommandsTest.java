@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.springframework.shell.support.util.OsUtils;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
 import static com.xebialabs.restito.builder.stub.StubHttp.whenHttp;
@@ -130,5 +131,44 @@ public class DataStoreCommandsTest extends BaseTest {
         assertEquals(update, params.get("update")[0]);
         assertEquals(charset, params.get("charset")[0]);
         verifyHttp(server).once(method(Method.PUT), uri(url));
+    }
+
+    @Test
+    public void getParametersFromString() throws Exception {
+
+        // PostGIS
+        Map params = DataStoreCommands.getParametersFromString("dbtype=postgis database=postgres host=localhost port=5432");
+        assertEquals(params.get("dbtype"), "postgis");
+        assertEquals(params.get("database"), "postgres");
+        assertEquals(params.get("host"), "localhost");
+        assertEquals(params.get("port"), "5432");
+
+        // Neo4j
+        params = DataStoreCommands.getParametersFromString("'The directory path of the neo4j database'=/opt/neo4j/data/graph.db");
+        assertEquals(params.get("The directory path of the neo4j database"), "/opt/neo4j/data/graph.db");
+
+        // H2
+        params = DataStoreCommands.getParametersFromString("dbtype=h2 database='C:\\My Data\\my.db'");
+        assertEquals(params.get("dbtype"), "h2");
+        assertEquals(params.get("database"), "C:\\My Data\\my.db");
+
+        // Shapefile
+        params = DataStoreCommands.getParametersFromString("/my/states.shp");
+        assertEquals(params.get("url"), "file:/my");
+
+        params = DataStoreCommands.getParametersFromString("url='/my/states.shp' 'create spatial index'=true");
+        assertEquals(params.get("url"), "file:/my/states.shp");
+        assertEquals(params.get("create spatial index"), "true");
+
+        // Property
+        params = DataStoreCommands.getParametersFromString("directory=/my/states.properties");
+        assertEquals(params.get("directory"), "/my/states.properties");
+
+        params = DataStoreCommands.getParametersFromString("directory=/my/propertyfiles");
+        assertEquals(params.get("directory"), "/my/propertyfiles");
+
+        params = DataStoreCommands.getParametersFromString("/my/states.properties");
+        assertEquals(params.get("directory"), "/my");
+
     }
 }

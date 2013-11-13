@@ -168,7 +168,7 @@ public class DataStoreCommands implements CommandMarker {
      *            quotes around key or values with internal spaces.
      * @return A Map of parameters
      */
-    private static Map getParametersFromString(String str) throws Exception {
+    protected static Map getParametersFromString(String str) throws Exception {
         Map<String, String> params = new HashMap<String, String>();
         if (str.indexOf("=") == -1) {
             if (str.endsWith(".shp")) {
@@ -188,7 +188,7 @@ public class DataStoreCommands implements CommandMarker {
                 throw new IllegalArgumentException("Unknown Workspace parameter string: " + str);
             }
         } else {
-            String[] segments = str.split("[ ]+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+            String[] segments = str.split("[ ]+(?=([^\']*\'[^\']*\')*[^\']*$)");
             for (String segment : segments) {
                 String[] parts = segment.split("=");
                 String key = parts[0].trim();
