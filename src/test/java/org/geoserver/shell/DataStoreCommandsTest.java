@@ -88,6 +88,39 @@ public class DataStoreCommandsTest extends BaseTest {
     }
 
     @Test
+    public void createNeo4jDataStore() throws Exception {
+        String url = "/geoserver/rest/workspaces/topp/datastores.json";
+        whenHttp(server).match(post(url)).then(stringContent("true"), status(HttpStatus.OK_200));
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        DataStoreCommands commands = new DataStoreCommands();
+        commands.setGeoserver(geoserver);
+        String workspace = "topp";
+        String name = "neo4j";
+        String connectionParams = "'The directory path of the neo4j database: '=/opt/neo4j/data/graph.db";
+        String description = null;
+        boolean enabled = true;
+        boolean result = commands.create(workspace, name, connectionParams, description, enabled);
+        assertTrue(result);
+        String actual = server.getCalls().get(0).getPostBody();
+        String expected = "{" +
+                "\"dataStore\":{" +
+                    "\"enabled\":true," +
+                    "\"connectionParamters\":{" +
+                        "\"entry\":[" +
+                            "{" +
+                                "\"@key\":\"The directory path of the neo4j database: \"," +
+                                "\"$\":\"/opt/neo4j/data/graph.db\"" +
+                            "}" +
+                        "]" +
+                    "}," +
+                    "\"name\":\"neo4j\"" +
+                    "}" +
+                "}";
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.POST), uri(url));
+    }
+
+    @Test
     public void modifyDataStore() throws Exception {
         String url = "/geoserver/rest/workspaces/topp/datastores/hydro.xml";
         whenHttp(server).match(put(url)).then(stringContent("true"), status(HttpStatus.OK_200));
@@ -104,6 +137,39 @@ public class DataStoreCommandsTest extends BaseTest {
         String actual = server.getCalls().get(0).getPostBody();
         String expected = "<dataStore><name>hydro</name>" +
                 "<description>The hydro lines for Tasmania</description></dataStore>";
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.PUT), uri(url));
+    }
+
+    @Test
+    public void modifyNeo4jDataStore() throws Exception {
+        String url = "/geoserver/rest/workspaces/topp/datastores/hydro.json";
+        whenHttp(server).match(put(url)).then(stringContent("true"), status(HttpStatus.OK_200));
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        DataStoreCommands commands = new DataStoreCommands();
+        commands.setGeoserver(geoserver);
+        String workspace = "topp";
+        String name = "hydro";
+        String connectionParams = "'The directory path of the neo4j database: '=/opt/neo4j/data/graph.db";
+        String description = "The hydro lines for Tasmania";
+        String enabled = null;
+        boolean result = commands.modify(workspace, name, connectionParams, description, enabled);
+        assertTrue(result);
+        String actual = server.getCalls().get(0).getPostBody();
+        String expected = "{" +
+                    "\"dataStore\":{" +
+                        "\"connectionParamters\":{" +
+                            "\"entry\":[" +
+                                "{" +
+                                    "\"@key\":\"The directory path of the neo4j database: \"," +
+                                    "\"$\":\"/opt/neo4j/data/graph.db\"" +
+                                "}" +
+                            "]" +
+                        "}," +
+                        "\"description\":\"The hydro lines for Tasmania\"," +
+                        "\"name\":\"hydro\"" +
+                    "}" +
+                "}";
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.PUT), uri(url));
     }
@@ -150,25 +216,25 @@ public class DataStoreCommandsTest extends BaseTest {
         // H2
         params = DataStoreCommands.getParametersFromString("dbtype=h2 database='C:\\My Data\\my.db'");
         assertEquals(params.get("dbtype"), "h2");
-        assertEquals(params.get("database"), "C:\\My Data\\my.db");
+        assertTrue(params.containsKey("database"));
 
         // Shapefile
         params = DataStoreCommands.getParametersFromString("/my/states.shp");
-        assertEquals(params.get("url"), "file:/my");
+        assertTrue(params.containsKey("url"));
 
         params = DataStoreCommands.getParametersFromString("url='/my/states.shp' 'create spatial index'=true");
-        assertEquals(params.get("url"), "file:/my/states.shp");
+        assertTrue(params.containsKey("url"));
         assertEquals(params.get("create spatial index"), "true");
 
         // Property
         params = DataStoreCommands.getParametersFromString("directory=/my/states.properties");
-        assertEquals(params.get("directory"), "/my/states.properties");
+        assertTrue(params.containsKey("directory"));
 
         params = DataStoreCommands.getParametersFromString("directory=/my/propertyfiles");
-        assertEquals(params.get("directory"), "/my/propertyfiles");
+        assertTrue(params.containsKey("directory"));
 
         params = DataStoreCommands.getParametersFromString("/my/states.properties");
-        assertEquals(params.get("directory"), "/my");
+        assertTrue(params.containsKey("directory"));
 
     }
 }

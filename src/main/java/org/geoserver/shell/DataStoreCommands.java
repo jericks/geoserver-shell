@@ -5,6 +5,8 @@ import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTDataStore;
 import it.geosolutions.geoserver.rest.decoder.RESTDataStoreList;
 import org.jdom.Element;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -14,10 +16,7 @@ import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class DataStoreCommands implements CommandMarker {
@@ -57,21 +56,47 @@ public class DataStoreCommands implements CommandMarker {
             @CliOption(key = "description", mandatory = false, help = "The description") String description,
             @CliOption(key = "enabled", mandatory = false, unspecifiedDefaultValue = "true", help = "The enabled flag") boolean enabled
     ) throws Exception {
-        Element dataStoreElement = new Element("dataStore");
-        dataStoreElement.addContent(new Element("name").setText(name));
-        if (description != null) {
-            dataStoreElement.addContent(new Element("description").setText(description));
-        }
-        dataStoreElement.addContent(new Element("enabled").setText(String.valueOf(enabled)));
         Map<String, String> params = getParametersFromString(connectionParams);
-        Element connectionParamElement = new Element("connectionParameters");
-        for (Map.Entry<String, String> param : params.entrySet()) {
-            connectionParamElement.addContent(new Element(param.getKey()).setText(param.getValue()));
+        // XML Element names can't have spaces, so use JSON instead
+        String response = null;
+        if (doesConnectionParamKeyHaveSpace(params.keySet())) {
+            JSONObject jsonObject = new JSONObject();
+            JSONObject dataStoreObject = new JSONObject();
+            dataStoreObject.put("name", name);
+            if (description != null) {
+                dataStoreObject.put("description", description);
+            }
+            dataStoreObject.put("enabled", enabled);
+            JSONObject connectionParamsObject = new JSONObject();
+            JSONArray entryArray = new JSONArray();
+            for (Map.Entry<String, String> param : params.entrySet()) {
+                JSONObject entryObject = new JSONObject();
+                entryObject.put("@key", param.getKey());
+                entryObject.put("$", param.getValue());
+                entryArray.put(entryObject);
+            }
+            connectionParamsObject.put("entry", entryArray);
+            dataStoreObject.put("connectionParamters", connectionParamsObject);
+            jsonObject.put("dataStore", dataStoreObject);
+            String json = jsonObject.toString();
+            String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores.json";
+            response = HTTPUtils.post(url, json, "application/json", geoserver.getUser(), geoserver.getPassword());
+        } else {
+            Element dataStoreElement = new Element("dataStore");
+            dataStoreElement.addContent(new Element("name").setText(name));
+            if (description != null) {
+                dataStoreElement.addContent(new Element("description").setText(description));
+            }
+            dataStoreElement.addContent(new Element("enabled").setText(String.valueOf(enabled)));
+            Element connectionParamElement = new Element("connectionParameters");
+            for (Map.Entry<String, String> param : params.entrySet()) {
+                connectionParamElement.addContent(new Element(param.getKey()).setText(param.getValue()));
+            }
+            dataStoreElement.addContent(connectionParamElement);
+            String xml = JDOMUtil.toString(dataStoreElement);
+            String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores.xml";
+            response = HTTPUtils.postXml(url, xml, geoserver.getUser(), geoserver.getPassword());
         }
-        dataStoreElement.addContent(connectionParamElement);
-        String xml = JDOMUtil.toString(dataStoreElement);
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores.xml";
-        String response = HTTPUtils.postXml(url, xml, geoserver.getUser(), geoserver.getPassword());
         return response != null;
     }
 
@@ -83,25 +108,58 @@ public class DataStoreCommands implements CommandMarker {
             @CliOption(key = "description", mandatory = false, help = "The description") String description,
             @CliOption(key = "enabled", mandatory = false, help = "The enabled flag") String enabled
     ) throws Exception {
-        Element dataStoreElement = new Element("dataStore");
-        dataStoreElement.addContent(new Element("name").setText(name));
-        if (description != null) {
-            dataStoreElement.addContent(new Element("description").setText(description));
-        }
-        if (enabled != null) {
-            dataStoreElement.addContent(new Element("enabled").setText(enabled));
-        }
+        Map<String, String> params = new HashMap<String, String>();
         if (connectionParams != null) {
-            Map<String, String> params = getParametersFromString(connectionParams);
-            Element connectionParamElement = new Element("connectionParameters");
-            for (Map.Entry<String, String> param : params.entrySet()) {
-                connectionParamElement.addContent(new Element(param.getKey()).setText(param.getValue()));
-            }
-            dataStoreElement.addContent(connectionParamElement);
+            params = getParametersFromString(connectionParams);
         }
-        String xml = JDOMUtil.toString(dataStoreElement);
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(name) + ".xml";
-        String response = HTTPUtils.putXml(url, xml, geoserver.getUser(), geoserver.getPassword());
+        // XML Element names can't have spaces, so use JSON instead
+        String response = null;
+        if (doesConnectionParamKeyHaveSpace(params.keySet())) {
+            JSONObject jsonObject = new JSONObject();
+            JSONObject dataStoreObject = new JSONObject();
+            dataStoreObject.put("name", name);
+            if (description != null) {
+                dataStoreObject.put("description", description);
+            }
+            if (enabled != null) {
+                dataStoreObject.put("enabled", enabled);
+            }
+            if (connectionParams != null && !connectionParams.isEmpty()) {
+                JSONObject connectionParamsObject = new JSONObject();
+                JSONArray entryArray = new JSONArray();
+                for (Map.Entry<String, String> param : params.entrySet()) {
+                    JSONObject entryObject = new JSONObject();
+                    entryObject.put("@key", param.getKey());
+                    entryObject.put("$", param.getValue());
+                    entryArray.put(entryObject);
+                }
+                connectionParamsObject.put("entry", entryArray);
+                dataStoreObject.put("connectionParamters", connectionParamsObject);
+            }
+            jsonObject.put("dataStore", dataStoreObject);
+            String json = jsonObject.toString();
+            String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(name) + ".json";
+            response = HTTPUtils.put(url, json, "application/json", geoserver.getUser(), geoserver.getPassword());
+        } else {
+            Element dataStoreElement = new Element("dataStore");
+            dataStoreElement.addContent(new Element("name").setText(name));
+            if (description != null) {
+                dataStoreElement.addContent(new Element("description").setText(description));
+            }
+            if (enabled != null) {
+                dataStoreElement.addContent(new Element("enabled").setText(enabled));
+            }
+            if (connectionParams != null && !connectionParams.isEmpty()) {
+                Element connectionParamElement = new Element("connectionParameters");
+                for (Map.Entry<String, String> param : params.entrySet()) {
+                    connectionParamElement.addContent(new Element(param.getKey()).setText(param.getValue()));
+                }
+                dataStoreElement.addContent(connectionParamElement);
+            }
+            String xml = JDOMUtil.toString(dataStoreElement);
+            String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(name) + ".xml";
+            response = HTTPUtils.putXml(url, xml, geoserver.getUser(), geoserver.getPassword());
+        }
         return response != null;
     }
 
@@ -208,6 +266,22 @@ public class DataStoreCommands implements CommandMarker {
             }
         }
         return params;
+    }
+
+    /**
+     * When creating or modifying a datastore, the connection param key can't have a space in it because
+     * XML Element names can't have spaces.
+     *
+     * @param keys The keys from a connection parameter map
+     * @return Whether any of the keys have a space in it
+     */
+    private boolean doesConnectionParamKeyHaveSpace(Set<String> keys) {
+        for (String key : keys) {
+            if (key.contains(" ")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
