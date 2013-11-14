@@ -49,7 +49,7 @@ public class WmsStoreCommandsTest extends BaseTest {
                 "   Connect Timeout: 30" + OsUtils.LINE_SEPARATOR +
                 "   Metadata: " + OsUtils.LINE_SEPARATOR +
                 "      useConnectionPooling: true" + OsUtils.LINE_SEPARATOR;
-        assertEquals(expected, actual);
+        assertStringsEquals(expected, actual, true);
         verifyHttp(server).once(method(Method.GET), uri(url));
     }
 
@@ -204,7 +204,7 @@ public class WmsStoreCommandsTest extends BaseTest {
                 "   Native Bounding Box: 33863.73245999857,777606.3746099799,330836.9724600009,959743.0446099902 EPSG:26986" + OsUtils.LINE_SEPARATOR +
                 "   LatLon Bounding Box: -73.53331821222113,41.23116987753426,-69.89858964987232,42.88811062709496 EPSG:26986" + OsUtils.LINE_SEPARATOR +
                 "   Store: massgis" + OsUtils.LINE_SEPARATOR;
-        assertEquals(expected, actual);
+        assertStringsEquals(expected, actual, true);
         verifyHttp(server).once(method(Method.GET), uri(url));
     }
 

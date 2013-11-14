@@ -100,7 +100,7 @@ public class FeatureTypeCommandsTest extends BaseTest {
                 "         Max Occurs: 1" + OsUtils.LINE_SEPARATOR +
                 "         Nillable: true" + OsUtils.LINE_SEPARATOR +
                 "         Length: 22" + OsUtils.LINE_SEPARATOR;
-                assertEquals(expected, actual);
+        assertStringsEquals(expected, actual, true);
         verifyHttp(server).once(method(Method.GET), uri(url));
     }
 

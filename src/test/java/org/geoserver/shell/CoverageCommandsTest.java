@@ -59,7 +59,7 @@ public class CoverageCommandsTest extends BaseTest {
         "   Metadata List: " + OsUtils.LINE_SEPARATOR +
         "      dirName: mosaic_mosaic" + OsUtils.LINE_SEPARATOR +
         "   Attribute List: " + OsUtils.LINE_SEPARATOR;
-        assertEquals(expected, actual);
+        assertStringsEquals(expected, actual, true);
         verifyHttp(server).once(method(Method.GET), uri(url));
     }
 
