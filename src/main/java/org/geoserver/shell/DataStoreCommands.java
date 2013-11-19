@@ -79,11 +79,8 @@ public class DataStoreCommands implements CommandMarker {
             dataStoreObject.put("connectionParameters", connectionParamsObject);
             jsonObject.put("dataStore", dataStoreObject);
             String json = jsonObject.toString();
-            System.out.println(json);
             String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores.json";
-            System.out.println(url);
             response = HTTPUtils.post(url, json, "application/json", geoserver.getUser(), geoserver.getPassword());
-            System.out.println(response);
         } else {
             Element dataStoreElement = new Element("dataStore");
             dataStoreElement.addContent(new Element("name").setText(name));
