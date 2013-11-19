@@ -105,17 +105,17 @@ public class DataStoreCommandsTest extends BaseTest {
         String expected = "{" +
                 "\"dataStore\":{" +
                     "\"enabled\":true," +
-                    "\"connectionParamters\":{" +
+                    "\"name\":\"neo4j\"," +
+                    "\"connectionParameters\":{" +
                         "\"entry\":[" +
                             "{" +
                                 "\"@key\":\"The directory path of the neo4j database: \"," +
                                 "\"$\":\"/opt/neo4j/data/graph.db\"" +
                             "}" +
                         "]" +
-                    "}," +
-                    "\"name\":\"neo4j\"" +
                     "}" +
-                "}";
+                "}" +
+            "}";
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.POST), uri(url));
     }
@@ -158,16 +158,16 @@ public class DataStoreCommandsTest extends BaseTest {
         String actual = server.getCalls().get(0).getPostBody();
         String expected = "{" +
                     "\"dataStore\":{" +
-                        "\"connectionParamters\":{" +
+                        "\"description\":\"The hydro lines for Tasmania\"," +
+                        "\"name\":\"hydro\"," +
+                        "\"connectionParameters\":{" +
                             "\"entry\":[" +
                                 "{" +
                                     "\"@key\":\"The directory path of the neo4j database: \"," +
                                     "\"$\":\"/opt/neo4j/data/graph.db\"" +
                                 "}" +
                             "]" +
-                        "}," +
-                        "\"description\":\"The hydro lines for Tasmania\"," +
-                        "\"name\":\"hydro\"" +
+                        "}" +
                     "}" +
                 "}";
         assertEquals(expected, actual);
