@@ -60,6 +60,10 @@ public class FeatureTypeCommands implements CommandMarker {
         for (String name : names) {
             builder.append(name + OsUtils.LINE_SEPARATOR);
         }
+        if (geoserver.isVerbose()) {
+            System.out.println("URL: " + url);
+            System.out.println("Response: " + xml);
+        }
         return builder.toString();
     }
 
@@ -74,6 +78,11 @@ public class FeatureTypeCommands implements CommandMarker {
         String xml = JDOMUtil.toString(rootElement);
         String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes.xml";
         String response = HTTPUtils.postXml(url, xml, geoserver.getUser(), geoserver.getPassword());
+        if (geoserver.isVerbose()) {
+            System.out.println("URL: " + url);
+            System.out.println("Data: " + xml);
+            System.out.println("Response: " + response);
+        }
         return response != null;
     }
 
@@ -131,6 +140,11 @@ public class FeatureTypeCommands implements CommandMarker {
         String xml = JDOMUtil.toString(rootElement);
         String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes.xml";
         String response = HTTPUtils.postXml(url, xml, geoserver.getUser(), geoserver.getPassword());
+        if (geoserver.isVerbose()) {
+            System.out.println("URL: " + url);
+            System.out.println("Data: " + xml);
+            System.out.println("Response: " + response);
+        }
         return response != null;
     }
 
@@ -175,6 +189,11 @@ public class FeatureTypeCommands implements CommandMarker {
         xmlBuilder.append("</featureType>");
         String content = xmlBuilder.toString();
         String response = HTTPUtils.putXml(url, content, geoserver.getUser(), geoserver.getPassword());
+        if (geoserver.isVerbose()) {
+            System.out.println("URL: " + url);
+            System.out.println("Data: " + content);
+            System.out.println("Response: " + response);
+        }
         return response != null;
     }
 
@@ -186,6 +205,9 @@ public class FeatureTypeCommands implements CommandMarker {
             @CliOption(key = "recurse", mandatory = false, help = "Whether to delete all associated layers", unspecifiedDefaultValue = "false", specifiedDefaultValue = "false") boolean recurse
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes/" + URLUtil.encode(featuretype) + ".xml?recurse=" + recurse;
+        if (geoserver.isVerbose()) {
+            System.out.println("URL: " + url);
+        }
         return HTTPUtils.delete(url, geoserver.getUser(), geoserver.getPassword());
     }
 
@@ -254,6 +276,10 @@ public class FeatureTypeCommands implements CommandMarker {
             if (elem.getChild("length") != null) {
                 builder.append(TAB).append(TAB).append(TAB).append("Length: ").append(elem.getChildText("length")).append(OsUtils.LINE_SEPARATOR);
             }
+        }
+        if (geoserver.isVerbose()) {
+            System.out.println("URL: " + url);
+            System.out.println("Response: " + xml);
         }
         return builder.toString();
     }
