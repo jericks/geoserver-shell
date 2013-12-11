@@ -47,13 +47,19 @@ public class FontCommands implements CommandMarker {
     }
 
     private List<String> getFontNames(String xml) {
-        Element root = JDOMBuilder.buildElement(xml);
-        List<Element> children = root.getChild("fonts").getChildren("entry");
-        List<String> fonts = new ArrayList<String>();
-        for (Element elem : children) {
-            fonts.add(elem.getTextTrim());
+    	List<String> fonts = new ArrayList<String>();
+
+    	Element root = JDOMBuilder.buildElement(xml);
+        Element fontElement = root.getChild("fonts");
+        if (fontElement != null) {
+            List<Element> children = fontElement.getChildren("entry");
+            for (Element elem : children) {
+        	    fonts.add(elem.getTextTrim());
+        	}
+
+            Collections.sort(fonts);
         }
-        Collections.sort(fonts);
+
         return fonts;
     }
 

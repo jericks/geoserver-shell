@@ -228,11 +228,17 @@ public class FeatureTypeCommands implements CommandMarker {
         builder.append(TAB).append("Description: ").append(featureTypeElement.getChildText("description")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Enabled: ").append(featureTypeElement.getChildText("enabled")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Advertised: ").append(featureTypeElement.getChildText("advertised")).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Namespace: ").append(featureTypeElement.getChild("namespace").getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+        Element namespaceElement = featureTypeElement.getChild("namespace");
+        if (namespaceElement != null) {
+            builder.append(TAB).append("Namespace: ").append(namespaceElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+        }
         builder.append(TAB).append("Keywords: ").append(OsUtils.LINE_SEPARATOR);
-        List<Element> keywordElements = featureTypeElement.getChild("keywords").getChildren("string");
-        for (Element elem : keywordElements) {
-            builder.append(TAB).append(TAB).append(elem.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
+        Element keywordElement = featureTypeElement.getChild("keywords");
+        if (keywordElement != null) {
+	        List<Element> keywordElements = keywordElement.getChildren("string");
+	        for (Element elem : keywordElements) {
+	            builder.append(TAB).append(TAB).append(elem.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
+	        }
         }
         builder.append(TAB).append("Native CRS: ").append(featureTypeElement.getChildText("nativeCRS")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("SRS: ").append(featureTypeElement.getChildText("srs")).append(OsUtils.LINE_SEPARATOR);
@@ -261,26 +267,35 @@ public class FeatureTypeCommands implements CommandMarker {
                 builder.append(TAB).append(TAB).append(elem.getAttributeValue("key")).append(" = ").append(elem.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
             }
         }
-        builder.append(TAB).append("Store: ").append(featureTypeElement.getChild("store").getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+
+        Element storeElement = featureTypeElement.getChild("store");
+        if (storeElement != null) {
+            builder.append(TAB).append("Store: ").append(storeElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+        }
         builder.append(TAB).append("Max Features: ").append(featureTypeElement.getChildText("maxFeatures")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("numDecimals: ").append(featureTypeElement.getChildText("numDecimals")).append(OsUtils.LINE_SEPARATOR);
 
-        List<Element> attributeElements = featureTypeElement.getChild("attributes").getChildren("attribute");
-        builder.append(TAB).append("Attributes: ").append(OsUtils.LINE_SEPARATOR);
-        for (Element elem : attributeElements) {
-            builder.append(TAB).append(TAB).append(elem.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
-            builder.append(TAB).append(TAB).append(TAB).append("Binding: ").append(elem.getChildText("binding")).append(OsUtils.LINE_SEPARATOR);
-            builder.append(TAB).append(TAB).append(TAB).append("Min Occurs: ").append(elem.getChildText("minOccurs")).append(OsUtils.LINE_SEPARATOR);
-            builder.append(TAB).append(TAB).append(TAB).append("Max Occurs: ").append(elem.getChildText("maxOccurs")).append(OsUtils.LINE_SEPARATOR);
-            builder.append(TAB).append(TAB).append(TAB).append("Nillable: ").append(elem.getChildText("nillable")).append(OsUtils.LINE_SEPARATOR);
-            if (elem.getChild("length") != null) {
-                builder.append(TAB).append(TAB).append(TAB).append("Length: ").append(elem.getChildText("length")).append(OsUtils.LINE_SEPARATOR);
-            }
+        Element attributesElement = featureTypeElement.getChild("attributes");
+        if (attributesElement != null) {
+	        List<Element> attributeElements = attributesElement.getChildren("attribute");
+	        builder.append(TAB).append("Attributes: ").append(OsUtils.LINE_SEPARATOR);
+	        for (Element elem : attributeElements) {
+	            builder.append(TAB).append(TAB).append(elem.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+	            builder.append(TAB).append(TAB).append(TAB).append("Binding: ").append(elem.getChildText("binding")).append(OsUtils.LINE_SEPARATOR);
+	            builder.append(TAB).append(TAB).append(TAB).append("Min Occurs: ").append(elem.getChildText("minOccurs")).append(OsUtils.LINE_SEPARATOR);
+	            builder.append(TAB).append(TAB).append(TAB).append("Max Occurs: ").append(elem.getChildText("maxOccurs")).append(OsUtils.LINE_SEPARATOR);
+	            builder.append(TAB).append(TAB).append(TAB).append("Nillable: ").append(elem.getChildText("nillable")).append(OsUtils.LINE_SEPARATOR);
+	            if (elem.getChild("length") != null) {
+	                builder.append(TAB).append(TAB).append(TAB).append("Length: ").append(elem.getChildText("length")).append(OsUtils.LINE_SEPARATOR);
+	            }
+	        }
         }
+
         if (geoserver.isVerbose()) {
             System.out.println("URL: " + url);
             System.out.println("Response: " + xml);
         }
+
         return builder.toString();
     }
 }

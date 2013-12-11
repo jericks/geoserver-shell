@@ -53,10 +53,13 @@ public class OWSCommands implements CommandMarker {
             builder.append(TAB).append("Max Input Memory: ").append(element.getChildText("maxInputMemory")).append(OsUtils.LINE_SEPARATOR);
             builder.append(TAB).append("Max Output Memory: ").append(element.getChildText("maxOutputMemory")).append(OsUtils.LINE_SEPARATOR);
             builder.append(TAB).append("Subsampling Enabled: ").append(element.getChildText("subsamplingEnabled")).append(OsUtils.LINE_SEPARATOR);
-            List<Element> versionElements = element.getChild("versions").getChildren("org.geotools.util.Version");
-            builder.append(TAB).append("Versions:").append(OsUtils.LINE_SEPARATOR);
-            for (Element versionElement : versionElements) {
-                builder.append(TAB).append(TAB).append(versionElement.getChildText("version")).append(OsUtils.LINE_SEPARATOR);
+            Element vElement = element.getChild("versions");
+            if (vElement != null) {
+                List<Element> versionElements = vElement.getChildren("org.geotools.util.Version");
+                builder.append(TAB).append("Versions:").append(OsUtils.LINE_SEPARATOR);
+                for (Element versionElement : versionElements) {
+                    builder.append(TAB).append(TAB).append(versionElement.getChildText("version")).append(OsUtils.LINE_SEPARATOR);
+                }
             }
         }
         return builder.toString();
@@ -162,12 +165,16 @@ public class OWSCommands implements CommandMarker {
             builder.append(TAB).append(TAB).append("Enabled: ").append(waterMarkElement.getChildText("enabled")).append(OsUtils.LINE_SEPARATOR);
             builder.append(TAB).append(TAB).append("Position: ").append(waterMarkElement.getChildText("position")).append(OsUtils.LINE_SEPARATOR);
             builder.append(TAB).append(TAB).append("Transparency: ").append(waterMarkElement.getChildText("transparency")).append(OsUtils.LINE_SEPARATOR);
-            List<Element> versionElements = element.getChild("versions").getChildren("org.geotools.util.Version");
-            builder.append(TAB).append("Versions:").append(OsUtils.LINE_SEPARATOR);
-            for (Element versionElement : versionElements) {
-                builder.append(TAB).append(TAB).append(versionElement.getChildText("version")).append(OsUtils.LINE_SEPARATOR);
+            Element vElement = element.getChild("versions");
+            if (vElement != null) {
+                List<Element> versionElements = vElement.getChildren("org.geotools.util.Version");
+                builder.append(TAB).append("Versions:").append(OsUtils.LINE_SEPARATOR);
+                for (Element versionElement : versionElements) {
+                    builder.append(TAB).append(TAB).append(versionElement.getChildText("version")).append(OsUtils.LINE_SEPARATOR);
+                }
             }
         }
+
         return builder.toString();
     }
 
@@ -307,10 +314,13 @@ public class OWSCommands implements CommandMarker {
                     builder.append(TAB).append(TAB).append(TAB).append("Override GML Attributes: ").append(entryGmlElement.getChildText("overrideGMLAttributes")).append(OsUtils.LINE_SEPARATOR);
                 }
             }
-            List<Element> versionElements = element.getChild("versions").getChildren("org.geotools.util.Version");
-            builder.append(TAB).append("Versions:").append(OsUtils.LINE_SEPARATOR);
-            for (Element versionElement : versionElements) {
-                builder.append(TAB).append(TAB).append(versionElement.getChildText("version")).append(OsUtils.LINE_SEPARATOR);
+            Element vElement = element.getChild("versions");
+            if (vElement != null) {
+                List<Element> versionElements = vElement.getChildren("org.geotools.util.Version");
+                builder.append(TAB).append("Versions:").append(OsUtils.LINE_SEPARATOR);
+                for (Element versionElement : versionElements) {
+                    builder.append(TAB).append(TAB).append(versionElement.getChildText("version")).append(OsUtils.LINE_SEPARATOR);
+                }
             }
         }
         return builder.toString();
