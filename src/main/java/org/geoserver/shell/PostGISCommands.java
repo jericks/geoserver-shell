@@ -40,7 +40,7 @@ public class PostGISCommands implements CommandMarker {
         connectionStringBuilder.append("database='").append(database).append("' ");
         connectionStringBuilder.append("schema='").append(schema).append("' ");
         connectionStringBuilder.append("user='").append(user).append("' ");
-        connectionStringBuilder.append("password='").append(password).append("'");
+        connectionStringBuilder.append("passwd='").append(password).append("'");
         DataStoreCommands dataStoreCommands = new DataStoreCommands();
         dataStoreCommands.setGeoserver(geoserver);
         return dataStoreCommands.create(workspace, datastore, connectionStringBuilder.toString(), null, true);
