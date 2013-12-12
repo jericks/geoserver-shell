@@ -74,7 +74,10 @@ public class StyleCommands implements CommandMarker {
         StringBuilder builder = new StringBuilder();
         String TAB = "   ";
         builder.append(element.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("SLD Version: ").append(element.getChild("sldVersion").getChildText("version")).append(OsUtils.LINE_SEPARATOR);
+        Element sldVersionElement = element.getChild("sldVersion");
+        if (sldVersionElement != null) {
+            builder.append(TAB).append("SLD Version: ").append(sldVersionElement.getChildText("version")).append(OsUtils.LINE_SEPARATOR);
+        }
         builder.append(TAB).append("File Name: ").append(element.getChildText("filename")).append(OsUtils.LINE_SEPARATOR);
         return builder.toString();
     }

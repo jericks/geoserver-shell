@@ -66,7 +66,10 @@ public class WmsStoreCommands implements CommandMarker {
         builder.append(element.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Type: ").append(element.getChildText("type")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Enabled: ").append(element.getChildText("enabled")).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Workspace: ").append(element.getChild("workspace").getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+        Element wsElement = element.getChild("workspace");
+        if (wsElement != null) {
+            builder.append(TAB).append("Workspace: ").append(wsElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+        }
         builder.append(TAB).append("Capabilities URL: ").append(element.getChildText("capabilitiesURL")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Max Connections: ").append(element.getChildText("maxConnections")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Read Timeout: ").append(element.getChildText("readTimeout")).append(OsUtils.LINE_SEPARATOR);
@@ -210,11 +213,17 @@ public class WmsStoreCommands implements CommandMarker {
         builder.append(TAB).append("Description: ").append(wmsLayerElement.getChildText("description")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Enabled: ").append(wmsLayerElement.getChildText("enabled")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Advertised: ").append(wmsLayerElement.getChildText("advertised")).append(OsUtils.LINE_SEPARATOR);
-        builder.append(TAB).append("Namespace: ").append(wmsLayerElement.getChild("namespace").getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+        Element nsElement = wmsLayerElement.getChild("namespace");
+        if (nsElement != null) {
+            builder.append(TAB).append("Namespace: ").append(nsElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+        }
         builder.append(TAB).append("Keywords: ").append(OsUtils.LINE_SEPARATOR);
-        List<Element> keywordElements = wmsLayerElement.getChild("keywords").getChildren("string");
-        for (Element elem : keywordElements) {
-            builder.append(TAB).append(TAB).append(elem.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
+        Element keywordsElement = wmsLayerElement.getChild("keywords");
+        if (keywordsElement != null) {
+            List<Element> keywordElements = keywordsElement.getChildren("string");
+            for (Element elem : keywordElements) {
+                builder.append(TAB).append(TAB).append(elem.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
+            }
         }
         builder.append(TAB).append("Native CRS: ").append(wmsLayerElement.getChildText("nativeCRS")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("SRS: ").append(wmsLayerElement.getChildText("srs")).append(OsUtils.LINE_SEPARATOR);
@@ -243,7 +252,12 @@ public class WmsStoreCommands implements CommandMarker {
                 builder.append(TAB).append(TAB).append(elem.getAttributeValue("key")).append(" = ").append(elem.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
             }
         }
-        builder.append(TAB).append("Store: ").append(wmsLayerElement.getChild("store").getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+
+        Element storeElement = wmsLayerElement.getChild("store");
+        if (storeElement != null) {
+            builder.append(TAB).append("Store: ").append(storeElement.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+        }
+
         return builder.toString();
     }
 
