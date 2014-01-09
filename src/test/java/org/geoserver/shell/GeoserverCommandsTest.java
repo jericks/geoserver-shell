@@ -15,6 +15,7 @@ import org.springframework.shell.support.util.OsUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 
 import static com.xebialabs.restito.builder.stub.StubHttp.whenHttp;
 import static com.xebialabs.restito.builder.verify.VerifyHttp.verifyHttp;
@@ -162,6 +163,39 @@ public class GeoserverCommandsTest extends BaseTest {
         assertNull(server.getCalls().get(0).getParameters().get("bbox"));
         assertNull(server.getCalls().get(0).getParameters().get("srsName"));
         assertNull(server.getCalls().get(0).getParameters().get("cql_filter"));
+        verifyHttp(server).once(method(Method.GET), uri(url));
+    }
+
+    @Test
+    public void getLegend() throws Exception {
+        String url = "/geoserver/wms";
+        whenHttp(server).match(get(url)).then(custom(new Function<Response, Response>() {
+            @Override
+            public Response apply(Response r) {
+                URL url = Resources.getResource("map.png");
+                try {
+                    r.getOutputStream().write(Resources.toByteArray(url));
+                } catch (IOException e) {
+                    System.err.println("Unable to read map.png!");
+                }
+                r.setContentType("image/png");
+                return r;
+            }
+        }), status(HttpStatus.OK_200));
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        GeoserverCommands commands = new GeoserverCommands();
+        commands.setGeoserver(geoserver);
+        String result = commands.getLegend("states", "states_by_pop", null, null, null, "legend.png", "20", "20", "image/png");
+        assertEquals("legend.png", result);
+        Map<String,String[]> params = server.getCalls().get(0).getParameters();
+        assertEquals("states", params.get("LAYER")[0]);
+        assertEquals("states_by_pop", params.get("STYLE")[0]);
+        assertNull(params.get("FEATURETYPE"));
+        assertNull(params.get("RULE"));
+        assertNull(params.get("SCALE"));
+        assertEquals("image/png", params.get("FORMAT")[0]);
+        assertEquals("20", params.get("WIDTH")[0]);
+        assertEquals("20", params.get("HEIGHT")[0]);
         verifyHttp(server).once(method(Method.GET), uri(url));
     }
 

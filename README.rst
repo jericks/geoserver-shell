@@ -110,6 +110,8 @@ Commands
 
     * geoserver getmap --layers states
 
+    * geoserver getlegend --layer states
+
     * geoserver getfeature --typeName topp:states
 
 * about

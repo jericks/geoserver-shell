@@ -26,7 +26,7 @@ public class GeoserverCommands implements CommandMarker {
 
     @CliAvailabilityIndicator({"geoserver reset", "geoserver reload", "geoserver backup",
             "geoserver restore", "geoserver verbose set", "geoserver show", "geoserver getmap",
-            "geoserver getfeature"
+            "geoserver getfeature", "geoserver getlegend"
     })
     public boolean isCommandAvailable() {
         return geoserver.isSet();
@@ -167,5 +167,55 @@ public class GeoserverCommands implements CommandMarker {
             url += "&cql_filter=" + cql;
         }
         return IOUtils.toString(new URL(url));
+    }
+
+    @CliCommand(value = "geoserver getlegend", help = "Get a legend from the WMS service.")
+    public String getLegend(
+            @CliOption(key = "layer", mandatory = true, help = "The layer") String layer,
+            @CliOption(key = "style", mandatory = false, help = "The style") String style,
+            @CliOption(key = "featuretype", mandatory = false, help = "The feature type") String featureType,
+            @CliOption(key = "rule", mandatory = false, help = "The rule") String rule,
+            @CliOption(key = "scale", mandatory = false, help = "The scale") String scale,
+            @CliOption(key = "file", mandatory = false, unspecifiedDefaultValue = "legend.png", help = "The file name") String fileName,
+            @CliOption(key = "width", mandatory = false, help = "The width") String width,
+            @CliOption(key = "height", mandatory = false, help = "The height") String height,
+            @CliOption(key = "format", mandatory = false, unspecifiedDefaultValue = "png", help = "The format") String format
+    ) throws Exception {
+        String url = geoserver.getUrl() + "/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0";
+        url += "&LAYER=" + URLUtil.encode(layer);
+        if (width != null) {
+            url += "&WIDTH=" + width;
+        }
+        if (height != null) {
+            url += "&HEIGHT=" + height;
+        }
+        if (style != null) {
+            url += "&STYLE=" + style;
+        }
+        if (featureType != null) {
+            url += "&FEATURETYPE=" + featureType;
+        }
+        if (rule != null) {
+            url += "&RULE=" + rule;
+        }
+        if (scale != null) {
+            url += "&SCALE=" + scale;
+        }
+        String formatMimeType = "image/png";
+        String formatImageIO = "png";
+        if (format.equalsIgnoreCase("jpeg") || format.equalsIgnoreCase("jpg")
+                || format.equalsIgnoreCase("image/jpeg") || format.equalsIgnoreCase("image/jpg")) {
+            formatMimeType = "image/jpeg";
+            formatImageIO = "jpeg";
+        }
+        url += "&FORMAT=" + formatMimeType;
+        String message = fileName;
+        BufferedImage image = ImageIO.read(new URL(url));
+        if (image != null) {
+            ImageIO.write(image, formatImageIO, new File(fileName));
+        } else {
+            message = "Unable to read URL (" + url + ")";
+        }
+        return message;
     }
 }
