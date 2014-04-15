@@ -386,6 +386,56 @@ Commands
       
     * wmsstore layer delete --workspace topp --store massgis --layer massgis:WELLS.WELLS_PT --recurse true
 
+* scripting (community module and only available for GeoServer 2.6 and greather)
+
+    * scripting wps list
+
+    * scripting wps get --name --file
+
+    * scripting wps create --name --file
+
+    * scripting wps modify --name --file
+
+    * scripting wps delete --name
+
+    * scripting function list
+
+    * scripting function get --name --file
+
+    * scripting function create --name --file
+
+    * scripting function modify --name --file
+
+    * scripting function delete --name
+
+    * scripting wfs tx list
+
+    * scripting wfs tx get --name --file
+
+    * scripting wfs tx create --name --file
+
+    * scripting wfs tx modify --name --file
+
+    * scripting wfs tx delete --name
+
+    * scripting app list
+
+    * scripting app get --name --file
+
+    * scripting app create --name --file
+
+    * scripting app modify --name --file
+
+    * scripting app delete --name
+
+    * scripting session list --ext
+
+    * scripting session get --ext --name
+
+    * scripting session create --ext
+
+    * scripting session run --ext --name --script
+
 Libraries
 ---------
 Spring Shell:
@@ -396,6 +446,12 @@ GeoServer Manager:
 
 GeoTools:
     http://www.geotools.org/
+
+Presentations
+-------------
+
+`GeoServer Shell: Administer GeoServer using a CLI <http://www.slideshare.net/JaredErickson/geo-servershell>`_
+
 
 License
 -------
