@@ -1,0 +1,8 @@
+{
+    scripts: {
+        script: [
+            {name: "buffer.groovy"},
+            {name: "merge.groovy"}
+        ]
+    }
+}

@@ -1,0 +1,6 @@
+{
+    sessions: [
+        {id: 0, engine: "groovy"},
+        {id: 1, engine: "python"}
+    ]
+}
