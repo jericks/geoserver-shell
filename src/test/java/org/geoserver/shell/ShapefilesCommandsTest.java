@@ -1,6 +1,5 @@
 package org.geoserver.shell;
 
-import com.xebialabs.restito.semantics.Call;
 import org.glassfish.grizzly.http.Method;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.junit.Test;
@@ -39,7 +38,7 @@ public class ShapefilesCommandsTest extends BaseTest {
         ShapefileCommands commands = new ShapefileCommands();
         commands.setGeoserver(geoserver);
         File file = getResourceFile("points.shp");
-        File zipFile = File.createTempFile("points",".zip");
+        File zipFile = File.createTempFile("points", ".zip");
         boolean result = commands.zip(file, zipFile);
         assertTrue(result);
         List<String> names = getFileNamesFromZip(zipFile);
