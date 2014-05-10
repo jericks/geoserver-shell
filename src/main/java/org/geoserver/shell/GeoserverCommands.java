@@ -1,6 +1,7 @@
 package org.geoserver.shell;
 
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
+import it.geosolutions.geoserver.rest.HTTPUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
@@ -33,7 +34,7 @@ public class GeoserverCommands implements CommandMarker {
     }
 
     @CliCommand(value = "geoserver set", help = "Set the url, user, and password for Geoserver.")
-    public void set(
+    public boolean set(
             @CliOption(key = "url", mandatory = true, help = "The url") String url,
             @CliOption(key = "user", mandatory = false, help = "The user name", unspecifiedDefaultValue = "admin") String user,
             @CliOption(key = "password", mandatory = false, help = "The password", unspecifiedDefaultValue = "geoserver") String password
@@ -41,6 +42,9 @@ public class GeoserverCommands implements CommandMarker {
         geoserver.setUrl(url);
         geoserver.setUser(user);
         geoserver.setPassword(password);
+        // Ping URL with username and password
+        String response = HTTPUtils.get(geoserver.getUrl() + "/rest/about/versions.xml", geoserver.getUser(), geoserver.getPassword());
+        return response != null;
     }
 
     @CliCommand(value = "geoserver verbose set", help = "Show the url, user, and password for Geoserver.")

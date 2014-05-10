@@ -26,14 +26,32 @@ import static junit.framework.Assert.*;
 public class GeoserverCommandsTest extends BaseTest {
 
     @Test
-    public void set() {
+    public void set() throws IOException {
+        whenHttp(server).match(get("/geoserver/rest/about/versions.xml")).then(stringContent(getResourceString("version.xml")), status(HttpStatus.OK_200));
         Geoserver gs = new Geoserver();
         GeoserverCommands commands = new GeoserverCommands();
         commands.setGeoserver(gs);
-        String url = "http://localhost:8080/geoserver";
+        String url = "http://00.0.0.0:8888/geoserver";
         String user = "admin";
         String pass = "geoserver";
-        commands.set(url, user, pass);
+        boolean result = commands.set(url, user, pass);
+        assertTrue(result);
+        assertEquals(url, gs.getUrl());
+        assertEquals(user, gs.getUser());
+        assertEquals(pass, gs.getPassword());
+    }
+
+    @Test
+    public void setBadUrl() throws IOException {
+        whenHttp(server).match(get("/geoserver/rest/about/versions.xml")).then(stringContent(getResourceString("version.xml")), status(HttpStatus.OK_200));
+        Geoserver gs = new Geoserver();
+        GeoserverCommands commands = new GeoserverCommands();
+        commands.setGeoserver(gs);
+        String url = "http://00.0.0.0:8888/bad_url/geoserver";
+        String user = "admin";
+        String pass = "geoserver";
+        boolean result = commands.set(url, user, pass);
+        assertFalse(result);
         assertEquals(url, gs.getUrl());
         assertEquals(user, gs.getUser());
         assertEquals(pass, gs.getPassword());
