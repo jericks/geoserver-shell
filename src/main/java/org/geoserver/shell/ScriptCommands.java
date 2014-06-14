@@ -79,7 +79,7 @@ public class ScriptCommands implements CommandMarker {
     @CliCommand(value = "scripting wps modify", help = "Modify a WPS script.")
     public boolean modifyWps(
             @CliOption(key = "name", mandatory = true, help = "The script name") String name,
-            @CliOption(key = "script", mandatory = true, help = "The script File") File file
+            @CliOption(key = "file", mandatory = true, help = "The script File") File file
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/scripts/wps/" + URLUtil.encode(name);
         String result = HTTPUtils.put(url, file, "plain/text", geoserver.getUser(), geoserver.getPassword());
@@ -129,7 +129,7 @@ public class ScriptCommands implements CommandMarker {
     @CliCommand(value = "scripting function create", help = "Create a filter function script.")
     public boolean createFunction(
             @CliOption(key = "name", mandatory = true, help = "The script name") String name,
-            @CliOption(key = "script", mandatory = true, help = "The script File") File file
+            @CliOption(key = "file", mandatory = true, help = "The script File") File file
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/scripts/function/" + URLUtil.encode(name);
         String result = HTTPUtils.put(url, file, "plain/text", geoserver.getUser(), geoserver.getPassword());
@@ -139,7 +139,7 @@ public class ScriptCommands implements CommandMarker {
     @CliCommand(value = "scripting function modify", help = "Modify a filter function script.")
     public boolean modifyFunction(
             @CliOption(key = "name", mandatory = true, help = "The script name") String name,
-            @CliOption(key = "script", mandatory = true, help = "The script File") File file
+            @CliOption(key = "file", mandatory = true, help = "The script File") File file
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/scripts/function/" + URLUtil.encode(name);
         String result = HTTPUtils.put(url, file, "plain/text", geoserver.getUser(), geoserver.getPassword());
@@ -189,7 +189,7 @@ public class ScriptCommands implements CommandMarker {
     @CliCommand(value = "scripting wfs tx create", help = "Create a wfs transaction script.")
     public boolean createWfsTx(
             @CliOption(key = "name", mandatory = true, help = "The script name") String name,
-            @CliOption(key = "script", mandatory = true, help = "The script File") File file
+            @CliOption(key = "file", mandatory = true, help = "The script File") File file
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/scripts/wfs/tx/" + URLUtil.encode(name);
         String result = HTTPUtils.put(url, file, "plain/text", geoserver.getUser(), geoserver.getPassword());
@@ -199,7 +199,7 @@ public class ScriptCommands implements CommandMarker {
     @CliCommand(value = "scripting wfs tx modify", help = "Modify a wfs transaction script.")
     public boolean modifyWfsTx(
             @CliOption(key = "name", mandatory = true, help = "The script name") String name,
-            @CliOption(key = "script", mandatory = true, help = "The script File") File file
+            @CliOption(key = "file", mandatory = true, help = "The script File") File file
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/scripts/wfs/tx/" + URLUtil.encode(name);
         String result = HTTPUtils.put(url, file, "plain/text", geoserver.getUser(), geoserver.getPassword());
@@ -251,7 +251,7 @@ public class ScriptCommands implements CommandMarker {
     public boolean createApp(
             @CliOption(key = "name", mandatory = true, help = "The app name") String name,
             @CliOption(key = "type", mandatory = true, help = "The app type (groovy, js, py)") String type,
-            @CliOption(key = "script", mandatory = true, help = "The script File") File file
+            @CliOption(key = "file", mandatory = true, help = "The script File") File file
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/scripts/apps/" + URLUtil.encode(name) + "/main." + type;
         String result = HTTPUtils.put(url, file, "plain/text", geoserver.getUser(), geoserver.getPassword());
@@ -262,7 +262,7 @@ public class ScriptCommands implements CommandMarker {
     public boolean modifyApp(
             @CliOption(key = "name", mandatory = true, help = "The app name") String name,
             @CliOption(key = "type", mandatory = true, help = "The app type (groovy, js, py)") String type,
-            @CliOption(key = "script", mandatory = true, help = "The script File") File file
+            @CliOption(key = "file", mandatory = true, help = "The script File") File file
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/scripts/apps/" + URLUtil.encode(name) + "/main." + type;
         String result = HTTPUtils.put(url, file, "plain/text", geoserver.getUser(), geoserver.getPassword());
