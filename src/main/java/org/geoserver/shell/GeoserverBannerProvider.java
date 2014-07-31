@@ -33,7 +33,7 @@ public class GeoserverBannerProvider extends DefaultBannerProvider implements Co
     }
 
     @Override
-    public String name() {
+    public String getProviderName() {
         return "geoserver shell";
     }
 }

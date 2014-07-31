@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 
-@Component
+@Component("GeoServerScriptCommands")
 public class ScriptCommands implements CommandMarker {
 
     @Autowired

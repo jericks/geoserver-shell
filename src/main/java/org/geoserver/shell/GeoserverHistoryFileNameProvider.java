@@ -15,7 +15,7 @@ public class GeoserverHistoryFileNameProvider extends DefaultHistoryFileNameProv
     }
 
     @Override
-    public String name() {
+    public String getProviderName() {
         return "geoserver shell history file name provider";
     }
 }

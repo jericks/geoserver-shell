@@ -15,7 +15,7 @@ public class GeoserverPromptProvider extends DefaultPromptProvider {
     }
 
     @Override
-    public String name() {
+    public String getProviderName() {
         return "geoserver shell prompt provider";
     }
 }

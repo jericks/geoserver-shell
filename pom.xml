@@ -14,7 +14,7 @@
         <dependency>
             <groupId>org.springframework.shell</groupId>
             <artifactId>spring-shell</artifactId>
-            <version>1.0.0.RELEASE</version>
+            <version>1.1.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>it.geosolutions</groupId>
@@ -39,12 +39,12 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-main</artifactId>
-            <version>11.0</version>
+            <version>11.2</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
-            <version>11.0</version>
+            <version>11.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>com.xebialabs.restito</groupId>
             <artifactId>restito</artifactId>
-            <version>0.4-beta-2</version>
+            <version>0.4-beta-3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
