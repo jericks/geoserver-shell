@@ -1,12 +1,10 @@
 package org.geoserver.shell;
 
+import com.google.common.base.Strings;
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
-import it.geosolutions.geoserver.rest.decoder.RESTCoverage;
-import it.geosolutions.geoserver.rest.decoder.RESTCoverageList;
-import it.geosolutions.geoserver.rest.decoder.RESTDimensionInfo;
-import it.geosolutions.geoserver.rest.decoder.RESTMetadataList;
+import it.geosolutions.geoserver.rest.decoder.*;
 import it.geosolutions.geoserver.rest.encoder.coverage.GSCoverageEncoder;
 import it.geosolutions.geoserver.rest.encoder.feature.FeatureTypeAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,7 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,23 +30,59 @@ public class CoverageCommands implements CommandMarker {
         this.geoserver = gs;
     }
 
-    @CliAvailabilityIndicator({"coverage list","coverage get", "coverage create", "coverage modify", "coverage delete"})
+    @CliAvailabilityIndicator({"coverage list", "coverage get", "coverage create", "coverage modify", "coverage delete"})
     public boolean isCommandAvailable() {
         return geoserver.isSet();
     }
 
     @CliCommand(value = "coverage list", help = "List coverages.")
     public String list(
-            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
-            @CliOption(key = "coveragestore", mandatory = true, help = "The coverage store") String coveragestore
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
+            @CliOption(key = "coveragestore", mandatory = false, help = "The coverage store") String coveragestore
     ) throws Exception {
-        GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
-        RESTCoverageList list = reader.getCoverages(workspace, coveragestore);
-        List<String> names = list.getNames();
-        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
-        for (String name : names) {
-            builder.append(name).append(OsUtils.LINE_SEPARATOR);
+        GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
+        List<String> workspaces = new ArrayList<String>();
+        if (workspace != null) {
+            workspaces.add(workspace);
+        } else {
+            List<String> names = reader.getWorkspaceNames();
+            Collections.sort(names);
+            workspaces.addAll(names);
+        }
+        int workspaceCounter = 0;
+        for (String w : workspaces) {
+            List<String> coverageStores = new ArrayList<String>();
+            if (coveragestore != null) {
+                coverageStores.add(coveragestore);
+            } else {
+                RESTCoverageStoreList list = reader.getCoverageStores(w);
+                List<String> names = list.getNames();
+                Collections.sort(names);
+                coverageStores.addAll(names);
+            }
+            if (workspaces.size() > 1) {
+                if (workspaceCounter > 0) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                }
+                builder.append(w).append(OsUtils.LINE_SEPARATOR);
+                builder.append(Strings.repeat("-", w.length())).append(OsUtils.LINE_SEPARATOR);
+            }
+            for (String cs : coverageStores) {
+                String indent = Strings.repeat(" ", workspaces.size() > 1 ? 3 : 0);
+                if (coverageStores.size() > 1) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                    builder.append(indent).append(cs).append(OsUtils.LINE_SEPARATOR);
+                    builder.append(indent).append(Strings.repeat("-", cs.length())).append(OsUtils.LINE_SEPARATOR);
+                }
+                RESTCoverageList list = reader.getCoverages(w, cs);
+                List<String> names = list.getNames();
+                Collections.sort(names);
+                for (String name : names) {
+                    builder.append(indent).append(name).append(OsUtils.LINE_SEPARATOR);
+                }
+            }
+            workspaceCounter++;
         }
         return builder.toString();
     }
