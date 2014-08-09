@@ -32,6 +32,41 @@ public class CoverageStoreCommandsTest extends BaseTest {
     }
 
     @Test
+    public void listAllCoverageStores() throws Exception {
+        String url1 = "/geoserver/rest/workspaces/it.geosolutions/coveragestores.xml";
+        whenHttp(server).match(get(url1)).then(stringContent(getResourceString("coveragestores.xml")), status(HttpStatus.OK_200));
+        String url2 = "/geoserver/rest/workspaces/topp/coveragestores.xml";
+        whenHttp(server).match(get(url2)).then(stringContent(getResourceString("coveragestores.xml")), status(HttpStatus.OK_200));
+        String url3 = "/geoserver/rest/workspaces/cite/coveragestores.xml";
+        whenHttp(server).match(get(url3)).then(stringContent(getResourceString("coveragestores.xml")), status(HttpStatus.OK_200));
+        String workspaceUrl = "/geoserver/rest/workspaces.xml";
+        whenHttp(server).match(get(workspaceUrl)).then(stringContent(getResourceString("workspaces.xml")), status(HttpStatus.OK_200));
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        CoverageStoreCommands commands = new CoverageStoreCommands();
+        commands.setGeoserver(geoserver);
+        String actual = commands.list(null);
+        String expected = "cite" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "arcGridSample" + OsUtils.LINE_SEPARATOR +
+                "mosaic" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "it.geosolutions" + OsUtils.LINE_SEPARATOR +
+                "---------------" + OsUtils.LINE_SEPARATOR +
+                "arcGridSample" + OsUtils.LINE_SEPARATOR +
+                "mosaic" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "topp" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "arcGridSample" + OsUtils.LINE_SEPARATOR +
+                "mosaic" + OsUtils.LINE_SEPARATOR;
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.GET), uri(url1));
+        verifyHttp(server).once(method(Method.GET), uri(url2));
+        verifyHttp(server).once(method(Method.GET), uri(url3));
+        verifyHttp(server).once(method(Method.GET), uri(workspaceUrl));
+    }
+
+    @Test
     public void getCoverageStore() throws Exception {
         String url = "/geoserver/rest/workspaces/nurc/coveragestores/arcGridSample.xml";
         whenHttp(server).match(get(url)).then(stringContent(getResourceString("coveragestore.xml")), status(HttpStatus.OK_200));

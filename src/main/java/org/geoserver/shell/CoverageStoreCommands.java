@@ -1,5 +1,6 @@
 package org.geoserver.shell;
 
+import com.google.common.base.Strings;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTCoverageStoreList;
@@ -14,6 +15,7 @@ import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,15 +37,36 @@ public class CoverageStoreCommands implements CommandMarker {
 
     @CliCommand(value = "coverage store list", help = "List coverage store.")
     public String list(
-            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace
     ) throws Exception {
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
-        RESTCoverageStoreList list = reader.getCoverageStores(workspace);
-        List<String> names = list.getNames();
-        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
-        for (String name : names) {
-            builder.append(name).append(OsUtils.LINE_SEPARATOR);
+        List<String> workspaces = new ArrayList<String>();
+        if (workspace != null) {
+            workspaces.add(workspace);
+        } else {
+            List<String> names = reader.getWorkspaceNames();
+            Collections.sort(names);
+            workspaces.addAll(names);
+        }
+        int counter = 0;
+        for(String w : workspaces) {
+            if (workspaces.size() > 1) {
+                if (counter > 0) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                }
+                builder.append(w).append(OsUtils.LINE_SEPARATOR);
+                builder.append(Strings.repeat("-", w.length())).append(OsUtils.LINE_SEPARATOR);
+            }
+            RESTCoverageStoreList list = reader.getCoverageStores(w);
+            List<String> names = list.getNames();
+            if (names.size() > 0) {
+                Collections.sort(names);
+                for (String name : names) {
+                    builder.append(name).append(OsUtils.LINE_SEPARATOR);
+                }
+            }
+            counter++;
         }
         return builder.toString();
     }
