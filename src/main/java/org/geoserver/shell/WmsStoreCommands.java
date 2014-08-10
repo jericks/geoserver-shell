@@ -1,5 +1,7 @@
 package org.geoserver.shell;
 
+import com.google.common.base.Strings;
+import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import org.jdom.Element;
@@ -35,20 +37,43 @@ public class WmsStoreCommands implements CommandMarker {
 
     @CliCommand(value = "wmsstore list", help = "List WMS Stores.")
     public String listStores(
-            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores.xml";
-        String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         StringBuilder builder = new StringBuilder();
-        Element element = JDOMBuilder.buildElement(xml);
-        List<Element> wmsStoreElements = element.getChildren("wmsStore");
-        List<String> names = new ArrayList<String>();
-        for (Element wmsStoreElement : wmsStoreElements) {
-            names.add(wmsStoreElement.getChildText("name"));
+        GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
+        // Build up list of Workspaces
+        List<String> workspaces = new ArrayList<String>();
+        if (workspace != null) {
+            workspaces.add(workspace);
+        } else {
+            List<String> names = reader.getWorkspaceNames();
+            Collections.sort(names);
+            workspaces.addAll(names);
         }
-        Collections.sort(names);
-        for (String name : names) {
-            builder.append(name).append(OsUtils.LINE_SEPARATOR);
+        int counter = 0;
+        for (String w : workspaces) {
+            // Display Workspace (but only if we are showing more than one)
+            if (workspaces.size() > 1) {
+                if (counter > 0) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                }
+                builder.append(w).append(OsUtils.LINE_SEPARATOR);
+                builder.append(Strings.repeat("-", w.length())).append(OsUtils.LINE_SEPARATOR);
+            }
+            // Get the WMS Stores
+            String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(w) + "/wmsstores.xml";
+            String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
+            Element element = JDOMBuilder.buildElement(xml);
+            List<Element> wmsStoreElements = element.getChildren("wmsStore");
+            List<String> names = new ArrayList<String>();
+            for (Element wmsStoreElement : wmsStoreElements) {
+                names.add(wmsStoreElement.getChildText("name"));
+            }
+            Collections.sort(names);
+            for (String name : names) {
+                builder.append(name).append(OsUtils.LINE_SEPARATOR);
+            }
+            counter++;
         }
         return builder.toString();
     }
@@ -156,42 +181,140 @@ public class WmsStoreCommands implements CommandMarker {
 
     @CliCommand(value = "wmsstore layer list", help = "List the Layers in a WMS Store.")
     public String listPublishedLayers(
-            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
-            @CliOption(key = "store", mandatory = true, help = "The WMS Store") String store
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
+            @CliOption(key = "store", mandatory = false, help = "The WMS Store") String store
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) + "/wmslayers.xml";
-        String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         StringBuilder builder = new StringBuilder();
-        Element element = JDOMBuilder.buildElement(xml);
-        List<Element> wmsStoreElements = element.getChildren("wmsLayer");
-        List<String> names = new ArrayList<String>();
-        for (Element wmsStoreElement : wmsStoreElements) {
-            names.add(wmsStoreElement.getChildText("name"));
+        GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
+        // Build the List of Workspaces
+        List<String> workspaces = new ArrayList<String>();
+        if (workspace != null) {
+            workspaces.add(workspace);
+        } else {
+            List<String> names = reader.getWorkspaceNames();
+            Collections.sort(names);
+            workspaces.addAll(names);
         }
-        Collections.sort(names);
-        for (String name : names) {
-            builder.append(name).append(OsUtils.LINE_SEPARATOR);
+        int workspaceCounter = 0;
+        for (String w : workspaces) {
+            // Build up the List of WMSStores
+            List<String> wmsStores = new ArrayList<String>();
+            if (store != null) {
+                wmsStores.add(store);
+            } else {
+                // Get the WMS Stores
+                String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(w) + "/wmsstores.xml";
+                String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
+                Element element = JDOMBuilder.buildElement(xml);
+                List<Element> wmsStoreElements = element.getChildren("wmsStore");
+                List<String> names = new ArrayList<String>();
+                for (Element wmsStoreElement : wmsStoreElements) {
+                    names.add(wmsStoreElement.getChildText("name"));
+                }
+                Collections.sort(names);
+                wmsStores.addAll(names);
+            }
+            // Display the Workspace (but only if we are showing more than one)
+            if (workspaces.size() > 1) {
+                if (workspaceCounter > 0) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                }
+                builder.append(w).append(OsUtils.LINE_SEPARATOR);
+                builder.append(Strings.repeat("-", w.length())).append(OsUtils.LINE_SEPARATOR);
+            }
+            for (String wmsStore : wmsStores) {
+                String indent = Strings.repeat(" ", workspaces.size() > 1 ? 3 : 0);
+                // Display the WMSStore (but only if we are showing more than one)
+                if (wmsStores.size() > 1) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                    builder.append(indent).append(wmsStore).append(OsUtils.LINE_SEPARATOR);
+                    builder.append(indent).append(Strings.repeat("-", wmsStore.length())).append(OsUtils.LINE_SEPARATOR);
+                }
+                // Get the List of WMS Layers
+                String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(w) + "/wmsstores/" + URLUtil.encode(wmsStore) + "/wmslayers.xml";
+                String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
+                Element element = JDOMBuilder.buildElement(xml);
+                List<Element> wmsStoreElements = element.getChildren("wmsLayer");
+                List<String> names = new ArrayList<String>();
+                for (Element wmsStoreElement : wmsStoreElements) {
+                    names.add(wmsStoreElement.getChildText("name"));
+                }
+                Collections.sort(names);
+                for (String name : names) {
+                    builder.append(indent).append(name).append(OsUtils.LINE_SEPARATOR);
+                }
+            }
+            workspaceCounter++;
         }
         return builder.toString();
     }
 
     @CliCommand(value = "wmsstore available layer list", help = "List the available Layers in a WMS Store.")
     public String listAvailableLayers(
-            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
-            @CliOption(key = "store", mandatory = true, help = "The WMS Store") String store
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
+            @CliOption(key = "store", mandatory = false, help = "The WMS Store") String store
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/wmsstores/" + URLUtil.encode(store) + "/wmslayers.xml?list=available";
-        String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
         StringBuilder builder = new StringBuilder();
-        Element element = JDOMBuilder.buildElement(xml);
-        List<Element> wmsStoreElements = element.getChildren("wmsLayerName");
-        List<String> names = new ArrayList<String>();
-        for (Element wmsStoreElement : wmsStoreElements) {
-            names.add(wmsStoreElement.getTextTrim());
+        GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
+        // Build the List of Workspaces
+        List<String> workspaces = new ArrayList<String>();
+        if (workspace != null) {
+            workspaces.add(workspace);
+        } else {
+            List<String> names = reader.getWorkspaceNames();
+            Collections.sort(names);
+            workspaces.addAll(names);
         }
-        Collections.sort(names);
-        for (String name : names) {
-            builder.append(name).append(OsUtils.LINE_SEPARATOR);
+        int workspaceCounter = 0;
+        for (String w : workspaces) {
+            // Build up the List of WMSStores
+            List<String> wmsStores = new ArrayList<String>();
+            if (store != null) {
+                wmsStores.add(store);
+            } else {
+                // Get the WMS Stores
+                String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(w) + "/wmsstores.xml";
+                String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
+                Element element = JDOMBuilder.buildElement(xml);
+                List<Element> wmsStoreElements = element.getChildren("wmsStore");
+                List<String> names = new ArrayList<String>();
+                for (Element wmsStoreElement : wmsStoreElements) {
+                    names.add(wmsStoreElement.getChildText("name"));
+                }
+                Collections.sort(names);
+                wmsStores.addAll(names);
+            }
+            // Display the Workspace (but only if we are showing more than one)
+            if (workspaces.size() > 1) {
+                if (workspaceCounter > 0) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                }
+                builder.append(w).append(OsUtils.LINE_SEPARATOR);
+                builder.append(Strings.repeat("-", w.length())).append(OsUtils.LINE_SEPARATOR);
+            }
+            for (String wmsStore : wmsStores) {
+                String indent = Strings.repeat(" ", workspaces.size() > 1 ? 3 : 0);
+                // Display the WMSStore (but only if we are showing more than one)
+                if (wmsStores.size() > 1) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                    builder.append(indent).append(wmsStore).append(OsUtils.LINE_SEPARATOR);
+                    builder.append(indent).append(Strings.repeat("-", wmsStore.length())).append(OsUtils.LINE_SEPARATOR);
+                }
+                // Get the List of WMS Layers
+                String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(w) + "/wmsstores/" + URLUtil.encode(wmsStore) + "/wmslayers.xml?list=available";
+                String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
+                Element element = JDOMBuilder.buildElement(xml);
+                List<Element> wmsStoreElements = element.getChildren("wmsLayerName");
+                List<String> names = new ArrayList<String>();
+                for (Element wmsStoreElement : wmsStoreElements) {
+                    names.add(wmsStoreElement.getTextTrim());
+                }
+                Collections.sort(names);
+                for (String name : names) {
+                    builder.append(indent).append(name).append(OsUtils.LINE_SEPARATOR);
+                }
+            }
+            workspaceCounter++;
         }
         return builder.toString();
     }

@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.springframework.shell.support.util.OsUtils;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Map;
 
 import static com.xebialabs.restito.builder.stub.StubHttp.whenHttp;
@@ -30,6 +29,44 @@ public class DataStoreCommandsTest extends BaseTest {
         String expected = "geology" + OsUtils.LINE_SEPARATOR + "rivers" + OsUtils.LINE_SEPARATOR + "states" + OsUtils.LINE_SEPARATOR;
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.GET), uri(url));
+    }
+
+    @Test
+    public void listAllDataStores() throws Exception {
+        String workspaceUrl = "/geoserver/rest/workspaces.xml";
+        whenHttp(server).match(get(workspaceUrl)).then(stringContent(getResourceString("workspaces.xml")), status(HttpStatus.OK_200));
+        String[] workspaces = {"it.geosolutions", "topp", "cite"};
+        for (String workspace : workspaces) {
+            String url = "/geoserver/rest/workspaces/" + workspace + "/datastores.xml";
+            whenHttp(server).match(get(url)).then(stringContent(getResourceString("datastores.xml")), status(HttpStatus.OK_200));
+        }
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        DataStoreCommands commands = new DataStoreCommands();
+        commands.setGeoserver(geoserver);
+        String actual = commands.list(null);
+        String expected = "cite" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "geology" + OsUtils.LINE_SEPARATOR +
+                "rivers" + OsUtils.LINE_SEPARATOR +
+                "states" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "it.geosolutions" + OsUtils.LINE_SEPARATOR +
+                "---------------" + OsUtils.LINE_SEPARATOR +
+                "geology" + OsUtils.LINE_SEPARATOR +
+                "rivers" + OsUtils.LINE_SEPARATOR +
+                "states" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "topp" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "geology" + OsUtils.LINE_SEPARATOR +
+                "rivers" + OsUtils.LINE_SEPARATOR +
+                "states" + OsUtils.LINE_SEPARATOR;
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.GET), uri(workspaceUrl));
+        for (String workspace : workspaces) {
+            String url = "/geoserver/rest/workspaces/" + workspace + "/datastores.xml";
+            verifyHttp(server).once(method(Method.GET), uri(url));
+        }
     }
 
     @Test
@@ -104,18 +141,18 @@ public class DataStoreCommandsTest extends BaseTest {
         String actual = server.getCalls().get(0).getPostBody();
         String expected = "{" +
                 "\"dataStore\":{" +
-                    "\"enabled\":true," +
-                    "\"name\":\"neo4j\"," +
-                    "\"connectionParameters\":{" +
-                        "\"entry\":[" +
-                            "{" +
-                                "\"@key\":\"The directory path of the neo4j database: \"," +
-                                "\"$\":\"/opt/neo4j/data/graph.db\"" +
-                            "}" +
-                        "]" +
-                    "}" +
+                "\"enabled\":true," +
+                "\"name\":\"neo4j\"," +
+                "\"connectionParameters\":{" +
+                "\"entry\":[" +
+                "{" +
+                "\"@key\":\"The directory path of the neo4j database: \"," +
+                "\"$\":\"/opt/neo4j/data/graph.db\"" +
                 "}" +
-            "}";
+                "]" +
+                "}" +
+                "}" +
+                "}";
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.POST), uri(url));
     }
@@ -157,18 +194,18 @@ public class DataStoreCommandsTest extends BaseTest {
         assertTrue(result);
         String actual = server.getCalls().get(0).getPostBody();
         String expected = "{" +
-                    "\"dataStore\":{" +
-                        "\"description\":\"The hydro lines for Tasmania\"," +
-                        "\"name\":\"hydro\"," +
-                        "\"connectionParameters\":{" +
-                            "\"entry\":[" +
-                                "{" +
-                                    "\"@key\":\"The directory path of the neo4j database: \"," +
-                                    "\"$\":\"/opt/neo4j/data/graph.db\"" +
-                                "}" +
-                            "]" +
-                        "}" +
-                    "}" +
+                "\"dataStore\":{" +
+                "\"description\":\"The hydro lines for Tasmania\"," +
+                "\"name\":\"hydro\"," +
+                "\"connectionParameters\":{" +
+                "\"entry\":[" +
+                "{" +
+                "\"@key\":\"The directory path of the neo4j database: \"," +
+                "\"$\":\"/opt/neo4j/data/graph.db\"" +
+                "}" +
+                "]" +
+                "}" +
+                "}" +
                 "}";
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.PUT), uri(url));

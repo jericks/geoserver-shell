@@ -30,6 +30,41 @@ public class WmsStoreCommandsTest extends BaseTest {
     }
 
     @Test
+    public void listAllStores() throws Exception {
+        String workspaceUrl = "/geoserver/rest/workspaces.xml";
+        whenHttp(server).match(get(workspaceUrl)).then(stringContent(getResourceString("workspaces.xml")), status(HttpStatus.OK_200));
+        String[] workspaces = {"it.geosolutions", "topp", "cite"};
+        for (String workspace : workspaces) {
+            String url = "/geoserver/rest/workspaces/" + workspace + "/wmsstores.xml";
+            whenHttp(server).match(get(url)).then(stringContent(getResourceString("wmsStores.xml")), status(HttpStatus.OK_200));
+        }
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        WmsStoreCommands commands = new WmsStoreCommands();
+        commands.setGeoserver(geoserver);
+        String actual = commands.listStores(null);
+        String expected = "cite" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "massgis" + OsUtils.LINE_SEPARATOR +
+                "usgs" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "it.geosolutions" + OsUtils.LINE_SEPARATOR +
+                "---------------" + OsUtils.LINE_SEPARATOR +
+                "massgis" + OsUtils.LINE_SEPARATOR +
+                "usgs" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "topp" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "massgis" + OsUtils.LINE_SEPARATOR +
+                "usgs" + OsUtils.LINE_SEPARATOR;
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.GET), uri(workspaceUrl));
+        for (String workspace : workspaces) {
+            String url = "/geoserver/rest/workspaces/" + workspace + "/wmsstores.xml";
+            verifyHttp(server).once(method(Method.GET), uri(url));
+        }
+    }
+
+    @Test
     public void getStore() throws Exception {
         String url = "/geoserver/rest/workspaces/topp/wmsstores/massgis.xml";
         whenHttp(server).match(get(url)).then(stringContent(getResourceString("wmsStore.xml")), status(HttpStatus.OK_200));
@@ -136,6 +171,74 @@ public class WmsStoreCommandsTest extends BaseTest {
     }
 
     @Test
+    public void listAllPublishedLayers() throws Exception {
+        String workspaceUrl = "/geoserver/rest/workspaces.xml";
+        whenHttp(server).match(get(workspaceUrl)).then(stringContent(getResourceString("workspaces.xml")), status(HttpStatus.OK_200));
+        String[] workspaces = {"it.geosolutions", "topp", "cite"};
+        String[] wmsStores = {"massgis", "usgs"};
+        for (String workspace : workspaces) {
+            String wmsStoresUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores.xml";
+            whenHttp(server).match(get(wmsStoresUrl)).then(stringContent(getResourceString("wmsstores.xml")), status(HttpStatus.OK_200));
+            for (String wmsStore : wmsStores) {
+                String wmsLayersUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores/" + wmsStore + "/wmslayers.xml";
+                whenHttp(server).match(get(wmsLayersUrl)).then(stringContent(getResourceString("wms_published_layers.xml")), status(HttpStatus.OK_200));
+            }
+        }
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        WmsStoreCommands commands = new WmsStoreCommands();
+        commands.setGeoserver(geoserver);
+        String actual = commands.listPublishedLayers(null, null);
+        String expected = "cite" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   massgis" + OsUtils.LINE_SEPARATOR +
+                "   -------" + OsUtils.LINE_SEPARATOR +
+                "   massgis:GISDATA.BIKETRAILS_ARC" + OsUtils.LINE_SEPARATOR +
+                "   massgis:WELLS.WELLS_PT" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   usgs" + OsUtils.LINE_SEPARATOR +
+                "   ----" + OsUtils.LINE_SEPARATOR +
+                "   massgis:GISDATA.BIKETRAILS_ARC" + OsUtils.LINE_SEPARATOR +
+                "   massgis:WELLS.WELLS_PT" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "it.geosolutions" + OsUtils.LINE_SEPARATOR +
+                "---------------" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   massgis" + OsUtils.LINE_SEPARATOR +
+                "   -------" + OsUtils.LINE_SEPARATOR +
+                "   massgis:GISDATA.BIKETRAILS_ARC" + OsUtils.LINE_SEPARATOR +
+                "   massgis:WELLS.WELLS_PT" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   usgs" + OsUtils.LINE_SEPARATOR +
+                "   ----" + OsUtils.LINE_SEPARATOR +
+                "   massgis:GISDATA.BIKETRAILS_ARC" + OsUtils.LINE_SEPARATOR +
+                "   massgis:WELLS.WELLS_PT" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "topp" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   massgis" + OsUtils.LINE_SEPARATOR +
+                "   -------" + OsUtils.LINE_SEPARATOR +
+                "   massgis:GISDATA.BIKETRAILS_ARC" + OsUtils.LINE_SEPARATOR +
+                "   massgis:WELLS.WELLS_PT" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   usgs" + OsUtils.LINE_SEPARATOR +
+                "   ----" + OsUtils.LINE_SEPARATOR +
+                "   massgis:GISDATA.BIKETRAILS_ARC" + OsUtils.LINE_SEPARATOR +
+                "   massgis:WELLS.WELLS_PT" + OsUtils.LINE_SEPARATOR;
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.GET), uri(workspaceUrl));
+        for (String workspace : workspaces) {
+            String wmsStoresUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores.xml";
+            verifyHttp(server).once(method(Method.GET), uri(wmsStoresUrl));
+            for (String wmsStore : wmsStores) {
+                String wmsLayersUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores/" + wmsStore + "/wmslayers.xml";
+                verifyHttp(server).once(method(Method.GET), uri(wmsLayersUrl));
+            }
+        }
+    }
+
+    @Test
     public void listAvailableLayers() throws Exception {
         String url = "/geoserver/rest/workspaces/topp/wmsstores/massgis/wmslayers.xml";
         whenHttp(server).match(get(url)).then(stringContent(getResourceString("wms_available_layers.xml")), status(HttpStatus.OK_200));
@@ -155,6 +258,116 @@ public class WmsStoreCommandsTest extends BaseTest {
         assertEquals(expected, actual);
         assertEquals("available", server.getCalls().get(0).getParameters().get("list")[0]);
         verifyHttp(server).once(method(Method.GET), uri(url));
+    }
+
+    @Test
+    public void listAllAvailableLayers() throws Exception {
+        String workspaceUrl = "/geoserver/rest/workspaces.xml";
+        whenHttp(server).match(get(workspaceUrl)).then(stringContent(getResourceString("workspaces.xml")), status(HttpStatus.OK_200));
+        String[] workspaces = {"it.geosolutions", "topp", "cite"};
+        String[] wmsStores = {"massgis", "usgs"};
+        for (String workspace : workspaces) {
+            String wmsStoresUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores.xml";
+            whenHttp(server).match(get(wmsStoresUrl)).then(stringContent(getResourceString("wmsstores.xml")), status(HttpStatus.OK_200));
+            for (String wmsStore : wmsStores) {
+                String wmsLayersUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores/" + wmsStore + "/wmslayers.xml";
+                whenHttp(server).match(get(wmsLayersUrl)).then(stringContent(getResourceString("wms_available_layers.xml")), status(HttpStatus.OK_200));
+            }
+        }
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        WmsStoreCommands commands = new WmsStoreCommands();
+        commands.setGeoserver(geoserver);
+        String actual = commands.listAvailableLayers(null, null);
+        String expected = "cite" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   massgis" + OsUtils.LINE_SEPARATOR +
+                "   -------" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BIRD_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BUTTERFLY_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_GRID_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.BLDGS_TEST_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_BLDGS_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_SITES_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_COMBINED_V_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.DCAM_BLDG_PTS_20120229" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   usgs" + OsUtils.LINE_SEPARATOR +
+                "   ----" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BIRD_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BUTTERFLY_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_GRID_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.BLDGS_TEST_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_BLDGS_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_SITES_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_COMBINED_V_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.DCAM_BLDG_PTS_20120229" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "it.geosolutions" + OsUtils.LINE_SEPARATOR +
+                "---------------" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   massgis" + OsUtils.LINE_SEPARATOR +
+                "   -------" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BIRD_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BUTTERFLY_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_GRID_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.BLDGS_TEST_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_BLDGS_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_SITES_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_COMBINED_V_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.DCAM_BLDG_PTS_20120229" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   usgs" + OsUtils.LINE_SEPARATOR +
+                "   ----" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BIRD_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BUTTERFLY_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_GRID_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.BLDGS_TEST_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_BLDGS_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_SITES_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_COMBINED_V_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.DCAM_BLDG_PTS_20120229" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "topp" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   massgis" + OsUtils.LINE_SEPARATOR +
+                "   -------" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BIRD_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BUTTERFLY_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_GRID_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.BLDGS_TEST_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_BLDGS_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_SITES_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_COMBINED_V_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.DCAM_BLDG_PTS_20120229" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   usgs" + OsUtils.LINE_SEPARATOR +
+                "   ----" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BIRD_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_BUTTERFLY_S_V" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.AUDUBON_GRID_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.BLDGS_TEST_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_BLDGS_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CAMPUS_SITES_POLY" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_COMBINED_V_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.CPA_PT" + OsUtils.LINE_SEPARATOR +
+                "   massgis:AFREEMAN.DCAM_BLDG_PTS_20120229" + OsUtils.LINE_SEPARATOR;
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.GET), uri(workspaceUrl));
+        for (String workspace : workspaces) {
+            String wmsStoresUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores.xml";
+            verifyHttp(server).once(method(Method.GET), uri(wmsStoresUrl));
+            for (String wmsStore : wmsStores) {
+                String wmsLayersUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores/" + wmsStore + "/wmslayers.xml";
+                verifyHttp(server).once(method(Method.GET), uri(wmsLayersUrl));
+            }
+        }
     }
 
     @Test

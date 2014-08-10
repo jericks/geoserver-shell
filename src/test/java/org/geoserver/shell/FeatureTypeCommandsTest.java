@@ -30,6 +30,98 @@ public class FeatureTypeCommandsTest extends BaseTest {
     }
 
     @Test
+    public void listAllFeatureTypes() throws Exception {
+        String workspaceUrl = "/geoserver/rest/workspaces.xml";
+        whenHttp(server).match(get(workspaceUrl)).then(stringContent(getResourceString("workspaces.xml")), status(HttpStatus.OK_200));
+        String[] workspaces = {"it.geosolutions", "topp", "cite"};
+        String[] dataStores = {"states", "rivers", "geology"};
+        for (String workspace : workspaces) {
+            String dataStoreUrl = "/geoserver/rest/workspaces/" + workspace + "/datastores.xml";
+            whenHttp(server).match(get(dataStoreUrl)).then(stringContent(getResourceString("datastores.xml")), status(HttpStatus.OK_200));
+            for (String dataStore : dataStores) {
+                String featureTypeUrl = "/geoserver/rest/workspaces/" + workspace + "/datastores/" + dataStore + "/featuretypes.xml";
+                whenHttp(server).match(get(featureTypeUrl)).then(stringContent(getResourceString("featuretypes.xml")), status(HttpStatus.OK_200));
+            }
+        }
+        Geoserver geoserver = new Geoserver("http://00.0.0.0:8888/geoserver", "admin", "geoserver");
+        FeatureTypeCommands commands = new FeatureTypeCommands();
+        commands.setGeoserver(geoserver);
+        String actual = commands.list(null, null, null);
+        String expected = "cite" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   geology" + OsUtils.LINE_SEPARATOR +
+                "   -------" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_cities" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_hydro" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_parcels" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   rivers" + OsUtils.LINE_SEPARATOR +
+                "   ------" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_cities" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_hydro" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_parcels" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   states" + OsUtils.LINE_SEPARATOR +
+                "   ------" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_cities" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_hydro" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_parcels" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "it.geosolutions" + OsUtils.LINE_SEPARATOR +
+                "---------------" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   geology" + OsUtils.LINE_SEPARATOR +
+                "   -------" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_cities" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_hydro" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_parcels" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   rivers" + OsUtils.LINE_SEPARATOR +
+                "   ------" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_cities" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_hydro" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_parcels" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   states" + OsUtils.LINE_SEPARATOR +
+                "   ------" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_cities" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_hydro" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_parcels" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "topp" + OsUtils.LINE_SEPARATOR +
+                "----" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   geology" + OsUtils.LINE_SEPARATOR +
+                "   -------" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_cities" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_hydro" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_parcels" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   rivers" + OsUtils.LINE_SEPARATOR +
+                "   ------" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_cities" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_hydro" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_parcels" + OsUtils.LINE_SEPARATOR +
+                "" + OsUtils.LINE_SEPARATOR +
+                "   states" + OsUtils.LINE_SEPARATOR +
+                "   ------" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_cities" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_hydro" + OsUtils.LINE_SEPARATOR +
+                "   tasmania_parcels" + OsUtils.LINE_SEPARATOR;
+        assertEquals(expected, actual);
+        verifyHttp(server).once(method(Method.GET), uri(workspaceUrl));
+        for (String workspace : workspaces) {
+            String coverageStoreUrl = "/geoserver/rest/workspaces/" + workspace + "/datastores.xml";
+            verifyHttp(server).once(method(Method.GET), uri(coverageStoreUrl));
+            for (String dataStore : dataStores) {
+                String featureTypeUrl = "/geoserver/rest/workspaces/" + workspace + "/datastores/" + dataStore + "/featuretypes.xml";
+                verifyHttp(server).once(method(Method.GET), uri(featureTypeUrl));
+            }
+        }
+    }
+
+    @Test
     public void getFeatureType() throws Exception {
         String url = "/geoserver/rest/workspaces/topp/datastores/taz_shapes/featuretypes/tasmania_cities.xml";
         whenHttp(server).match(get(url)).then(stringContent(getResourceString("featuretype.xml")), status(HttpStatus.OK_200));

@@ -38,11 +38,11 @@ public class LayerGroupCommands implements CommandMarker {
     public String list(
             @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace
     ) throws Exception {
+        StringBuilder builder = new StringBuilder();
         GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
         RESTLayerGroupList layerGroups = workspace == null ? reader.getLayerGroups() : reader.getLayerGroups(workspace);
         List<String> names = layerGroups.getNames();
         Collections.sort(names);
-        StringBuilder builder = new StringBuilder();
         for (String name : names) {
             builder.append(name + OsUtils.LINE_SEPARATOR);
         }

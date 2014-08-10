@@ -1,6 +1,9 @@
 package org.geoserver.shell;
 
+import com.google.common.base.Strings;
+import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
+import it.geosolutions.geoserver.rest.decoder.RESTDataStoreList;
 import it.geosolutions.geoserver.rest.decoder.utils.JDOMBuilder;
 import org.geotools.data.DataUtilities;
 import org.geotools.referencing.CRS;
@@ -36,33 +39,75 @@ public class FeatureTypeCommands implements CommandMarker {
 
     @CliCommand(value = "featuretype list", help = "List feature types.")
     public String list(
-            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace,
-            @CliOption(key = "datastore", mandatory = true, help = "The datastore") String datastore,
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace,
+            @CliOption(key = "datastore", mandatory = false, help = "The datastore") String datastore,
             @CliOption(key = "list", mandatory = false, unspecifiedDefaultValue = "configured", help = "The list parameter (configured, available, available_with_geom, all)") String list
     ) throws Exception {
-        String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(workspace) + "/datastores/" + URLUtil.encode(datastore) + "/featuretypes.xml?list=" + list;
-        String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
-        Element element = JDOMBuilder.buildElement(xml);
-        List<String> names = new ArrayList<String>();
-        if (element.getName().equalsIgnoreCase("featureTypes")) {
-            List<Element> elements = element.getChildren("featureType");
-            for (Element elem : elements) {
-                names.add(elem.getChildText("name"));
-            }
-        } else {
-            List<Element> elements = element.getChildren("featureTypeName");
-            for (Element elem : elements) {
-                names.add(elem.getTextTrim());
-            }
-        }
-        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
-        for (String name : names) {
-            builder.append(name + OsUtils.LINE_SEPARATOR);
+        GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
+        // Build the List of Workspaces
+        List<String> workspaces = new ArrayList<String>();
+        if (workspace != null) {
+            workspaces.add(workspace);
+        } else {
+            List<String> names = reader.getWorkspaceNames();
+            Collections.sort(names);
+            workspaces.addAll(names);
         }
-        if (geoserver.isVerbose()) {
-            System.out.println("URL: " + url);
-            System.out.println("Response: " + xml);
+        int workspaceCounter = 0;
+        for (String w : workspaces) {
+            // Build up the List of DataSstores
+            List<String> datastores = new ArrayList<String>();
+            if (datastore != null) {
+                datastores.add(datastore);
+            } else {
+                RESTDataStoreList dsList = reader.getDatastores(w);
+                List<String> names = dsList.getNames();
+                Collections.sort(names);
+                datastores.addAll(names);
+            }
+            // Display the Workspace (but only if we are showing more than one)
+            if (workspaces.size() > 1) {
+                if (workspaceCounter > 0) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                }
+                builder.append(w).append(OsUtils.LINE_SEPARATOR);
+                builder.append(Strings.repeat("-", w.length())).append(OsUtils.LINE_SEPARATOR);
+            }
+            for (String ds : datastores) {
+                String indent = Strings.repeat(" ", workspaces.size() > 1 ? 3 : 0);
+                // Display the Datastore (but only if we are showing more than one)
+                if (datastores.size() > 1) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                    builder.append(indent).append(ds).append(OsUtils.LINE_SEPARATOR);
+                    builder.append(indent).append(Strings.repeat("-", ds.length())).append(OsUtils.LINE_SEPARATOR);
+                }
+                // Get the List of FeatureTypes
+                String url = geoserver.getUrl() + "/rest/workspaces/" + URLUtil.encode(w) + "/datastores/" + URLUtil.encode(ds) + "/featuretypes.xml?list=" + list;
+                String xml = HTTPUtils.get(url, geoserver.getUser(), geoserver.getPassword());
+                Element element = JDOMBuilder.buildElement(xml);
+                List<String> names = new ArrayList<String>();
+                if (element.getName().equalsIgnoreCase("featureTypes")) {
+                    List<Element> elements = element.getChildren("featureType");
+                    for (Element elem : elements) {
+                        names.add(elem.getChildText("name"));
+                    }
+                } else {
+                    List<Element> elements = element.getChildren("featureTypeName");
+                    for (Element elem : elements) {
+                        names.add(elem.getTextTrim());
+                    }
+                }
+                Collections.sort(names);
+                for (String name : names) {
+                    builder.append(indent).append(name + OsUtils.LINE_SEPARATOR);
+                }
+                if (geoserver.isVerbose()) {
+                    System.out.println("URL: " + url);
+                    System.out.println("Response: " + xml);
+                }
+            }
+            workspaceCounter++;
         }
         return builder.toString();
     }
@@ -235,10 +280,10 @@ public class FeatureTypeCommands implements CommandMarker {
         builder.append(TAB).append("Keywords: ").append(OsUtils.LINE_SEPARATOR);
         Element keywordElement = featureTypeElement.getChild("keywords");
         if (keywordElement != null) {
-	        List<Element> keywordElements = keywordElement.getChildren("string");
-	        for (Element elem : keywordElements) {
-	            builder.append(TAB).append(TAB).append(elem.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
-	        }
+            List<Element> keywordElements = keywordElement.getChildren("string");
+            for (Element elem : keywordElements) {
+                builder.append(TAB).append(TAB).append(elem.getTextTrim()).append(OsUtils.LINE_SEPARATOR);
+            }
         }
         builder.append(TAB).append("Native CRS: ").append(featureTypeElement.getChildText("nativeCRS")).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("SRS: ").append(featureTypeElement.getChildText("srs")).append(OsUtils.LINE_SEPARATOR);
@@ -277,18 +322,18 @@ public class FeatureTypeCommands implements CommandMarker {
 
         Element attributesElement = featureTypeElement.getChild("attributes");
         if (attributesElement != null) {
-	        List<Element> attributeElements = attributesElement.getChildren("attribute");
-	        builder.append(TAB).append("Attributes: ").append(OsUtils.LINE_SEPARATOR);
-	        for (Element elem : attributeElements) {
-	            builder.append(TAB).append(TAB).append(elem.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
-	            builder.append(TAB).append(TAB).append(TAB).append("Binding: ").append(elem.getChildText("binding")).append(OsUtils.LINE_SEPARATOR);
-	            builder.append(TAB).append(TAB).append(TAB).append("Min Occurs: ").append(elem.getChildText("minOccurs")).append(OsUtils.LINE_SEPARATOR);
-	            builder.append(TAB).append(TAB).append(TAB).append("Max Occurs: ").append(elem.getChildText("maxOccurs")).append(OsUtils.LINE_SEPARATOR);
-	            builder.append(TAB).append(TAB).append(TAB).append("Nillable: ").append(elem.getChildText("nillable")).append(OsUtils.LINE_SEPARATOR);
-	            if (elem.getChild("length") != null) {
-	                builder.append(TAB).append(TAB).append(TAB).append("Length: ").append(elem.getChildText("length")).append(OsUtils.LINE_SEPARATOR);
-	            }
-	        }
+            List<Element> attributeElements = attributesElement.getChildren("attribute");
+            builder.append(TAB).append("Attributes: ").append(OsUtils.LINE_SEPARATOR);
+            for (Element elem : attributeElements) {
+                builder.append(TAB).append(TAB).append(elem.getChildText("name")).append(OsUtils.LINE_SEPARATOR);
+                builder.append(TAB).append(TAB).append(TAB).append("Binding: ").append(elem.getChildText("binding")).append(OsUtils.LINE_SEPARATOR);
+                builder.append(TAB).append(TAB).append(TAB).append("Min Occurs: ").append(elem.getChildText("minOccurs")).append(OsUtils.LINE_SEPARATOR);
+                builder.append(TAB).append(TAB).append(TAB).append("Max Occurs: ").append(elem.getChildText("maxOccurs")).append(OsUtils.LINE_SEPARATOR);
+                builder.append(TAB).append(TAB).append(TAB).append("Nillable: ").append(elem.getChildText("nillable")).append(OsUtils.LINE_SEPARATOR);
+                if (elem.getChild("length") != null) {
+                    builder.append(TAB).append(TAB).append(TAB).append("Length: ").append(elem.getChildText("length")).append(OsUtils.LINE_SEPARATOR);
+                }
+            }
         }
 
         if (geoserver.isVerbose()) {

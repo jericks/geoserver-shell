@@ -1,5 +1,6 @@
 package org.geoserver.shell;
 
+import com.google.common.base.Strings;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.decoder.RESTDataStore;
@@ -35,15 +36,34 @@ public class DataStoreCommands implements CommandMarker {
 
     @CliCommand(value = "datastore list", help = "List data stores.")
     public String list(
-            @CliOption(key = "workspace", mandatory = true, help = "The workspace") String workspace
+            @CliOption(key = "workspace", mandatory = false, help = "The workspace") String workspace
     ) throws Exception {
-        GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
-        RESTDataStoreList dataStores = reader.getDatastores(workspace);
-        List<String> names = dataStores.getNames();
-        Collections.sort(names);
         StringBuilder builder = new StringBuilder();
-        for (String name : names) {
-            builder.append(name + OsUtils.LINE_SEPARATOR);
+        GeoServerRESTReader reader = new GeoServerRESTReader(geoserver.getUrl(), geoserver.getUser(), geoserver.getPassword());
+        List<String> workspaces = new ArrayList<String>();
+        if (workspace != null) {
+            workspaces.add(workspace);
+        } else {
+            List<String> names = reader.getWorkspaceNames();
+            Collections.sort(names);
+            workspaces.addAll(names);
+        }
+        int counter = 0;
+        for (String w : workspaces) {
+            if (workspaces.size() > 1) {
+                if (counter > 0) {
+                    builder.append(OsUtils.LINE_SEPARATOR);
+                }
+                builder.append(w).append(OsUtils.LINE_SEPARATOR);
+                builder.append(Strings.repeat("-", w.length())).append(OsUtils.LINE_SEPARATOR);
+            }
+            RESTDataStoreList dataStores = reader.getDatastores(w);
+            List<String> names = dataStores.getNames();
+            Collections.sort(names);
+            for (String name : names) {
+                builder.append(name + OsUtils.LINE_SEPARATOR);
+            }
+            counter++;
         }
         return builder.toString();
     }
