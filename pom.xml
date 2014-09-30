@@ -69,9 +69,9 @@
             <url>http://maven.geo-solutions.it/</url>
         </repository>
         <repository>
-            <id>opengeo</id>
-            <name>OpenGeo Maven Repository</name>
-            <url>http://repo.opengeo.org</url>
+            <id>boundless</id>
+            <name>Boundless Maven Repository</name>
+            <url>http://repo.boundlessgeo.org/main</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
