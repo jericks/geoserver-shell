@@ -456,3 +456,6 @@ Presentations
 License
 -------
 GeoServer Shell is open source and licensed under the MIT License.
+
+.. image:: https://travis-ci.org/jericks/geoserver-shell.svg?branch=master
+    :target: https://travis-ci.org/jericks/geoserver-shell
