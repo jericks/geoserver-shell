@@ -36,7 +36,7 @@ public class WorldImageCommandsTest extends BaseTest {
     public void uploadWorldImage() throws Exception {
         String workspace = "nurc";
         String coverageStore = "terrain";
-        File file = getResourceFile("coverageStore.xml");
+        File file = getResourceFile("coveragestore.xml");
         String coverage = "myterrain";
         String url = "/geoserver/rest/workspaces/nurc/coveragestores/terrain/file.worldimage";
         whenHttp(server).match(put(url)).then(stringContent("true"), status(HttpStatus.OK_200));

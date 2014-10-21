@@ -139,7 +139,7 @@ public class CoverageStoreCommandsTest extends BaseTest {
     public void uploadCoverageStore() throws Exception {
         String workspace = "nurc";
         String coverageStore = "terrain";
-        File file = getResourceFile("coverageStore.xml");
+        File file = getResourceFile("coveragestore.xml");
         String type = "geotiff";
         String configure = "first";
         String coverage = "myterrain";

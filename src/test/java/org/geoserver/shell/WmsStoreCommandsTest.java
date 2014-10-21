@@ -178,7 +178,7 @@ public class WmsStoreCommandsTest extends BaseTest {
         String[] wmsStores = {"massgis", "usgs"};
         for (String workspace : workspaces) {
             String wmsStoresUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores.xml";
-            whenHttp(server).match(get(wmsStoresUrl)).then(stringContent(getResourceString("wmsstores.xml")), status(HttpStatus.OK_200));
+            whenHttp(server).match(get(wmsStoresUrl)).then(stringContent(getResourceString("wmsStores.xml")), status(HttpStatus.OK_200));
             for (String wmsStore : wmsStores) {
                 String wmsLayersUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores/" + wmsStore + "/wmslayers.xml";
                 whenHttp(server).match(get(wmsLayersUrl)).then(stringContent(getResourceString("wms_published_layers.xml")), status(HttpStatus.OK_200));
@@ -268,7 +268,7 @@ public class WmsStoreCommandsTest extends BaseTest {
         String[] wmsStores = {"massgis", "usgs"};
         for (String workspace : workspaces) {
             String wmsStoresUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores.xml";
-            whenHttp(server).match(get(wmsStoresUrl)).then(stringContent(getResourceString("wmsstores.xml")), status(HttpStatus.OK_200));
+            whenHttp(server).match(get(wmsStoresUrl)).then(stringContent(getResourceString("wmsStores.xml")), status(HttpStatus.OK_200));
             for (String wmsStore : wmsStores) {
                 String wmsLayersUrl = "/geoserver/rest/workspaces/" + workspace + "/wmsstores/" + wmsStore + "/wmslayers.xml";
                 whenHttp(server).match(get(wmsLayersUrl)).then(stringContent(getResourceString("wms_available_layers.xml")), status(HttpStatus.OK_200));
