@@ -109,7 +109,15 @@ public class DataStoreCommands implements CommandMarker {
             }
             dataStoreElement.addContent(new Element("enabled").setText(String.valueOf(enabled)));
             Element connectionParamElement = new Element("connectionParameters");
-            for (Map.Entry<String, String> param : params.entrySet()) {
+            List<Map.Entry<String, String>> connectionParamList = new LinkedList<Map.Entry<String, String>>(params.entrySet());
+            Collections.sort(connectionParamList, new Comparator<Map.Entry<String,String>>() {
+                @Override
+                public int compare( Map.Entry<String,String> o1, Map.Entry<String,String> o2 )
+                {
+                    return (o1.getKey()).compareTo( o2.getKey());
+                }
+            });
+            for (Map.Entry<String, String> param : connectionParamList) {
                 connectionParamElement.addContent(new Element(param.getKey()).setText(param.getValue()));
             }
             dataStoreElement.addContent(connectionParamElement);
@@ -171,7 +179,15 @@ public class DataStoreCommands implements CommandMarker {
             }
             if (connectionParams != null && !connectionParams.isEmpty()) {
                 Element connectionParamElement = new Element("connectionParameters");
-                for (Map.Entry<String, String> param : params.entrySet()) {
+                List<Map.Entry<String, String>> connectionParamList = new LinkedList<Map.Entry<String, String>>(params.entrySet());
+                Collections.sort(connectionParamList, new Comparator<Map.Entry<String,String>>() {
+                    @Override
+                    public int compare( Map.Entry<String,String> o1, Map.Entry<String,String> o2 )
+                    {
+                        return (o1.getKey()).compareTo( o2.getKey());
+                    }
+                });
+                for (Map.Entry<String, String> param : connectionParamList) {
                     connectionParamElement.addContent(new Element(param.getKey()).setText(param.getValue()));
                 }
                 dataStoreElement.addContent(connectionParamElement);
@@ -200,7 +216,15 @@ public class DataStoreCommands implements CommandMarker {
         builder.append(TAB).append("Workspace: ").append(dataStore.getWorkspaceName()).append(OsUtils.LINE_SEPARATOR);
         builder.append(TAB).append("Connection Parameters:").append(OsUtils.LINE_SEPARATOR);
         Map<String, String> params = dataStore.getConnectionParameters();
-        for (Map.Entry<String, String> param : params.entrySet()) {
+        List<Map.Entry<String, String>> connectionParamList = new LinkedList<Map.Entry<String, String>>(params.entrySet());
+        Collections.sort(connectionParamList, new Comparator<Map.Entry<String,String>>() {
+            @Override
+            public int compare( Map.Entry<String,String> o1, Map.Entry<String,String> o2 )
+            {
+                return (o1.getKey()).compareTo( o2.getKey());
+            }
+        });
+        for (Map.Entry<String, String> param : connectionParamList) {
             builder.append(TAB).append(TAB).append(param.getKey()).append(": ").append(param.getValue()).append(OsUtils.LINE_SEPARATOR);
         }
         return builder.toString();

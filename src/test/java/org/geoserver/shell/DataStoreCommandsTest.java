@@ -2,6 +2,7 @@ package org.geoserver.shell;
 
 import org.glassfish.grizzly.http.Method;
 import org.glassfish.grizzly.http.util.HttpStatus;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.springframework.shell.support.util.OsUtils;
 
@@ -14,6 +15,7 @@ import static com.xebialabs.restito.semantics.Action.status;
 import static com.xebialabs.restito.semantics.Action.stringContent;
 import static com.xebialabs.restito.semantics.Condition.*;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 public class DataStoreCommandsTest extends BaseTest {
@@ -84,8 +86,8 @@ public class DataStoreCommandsTest extends BaseTest {
                 "   Type: UNKNOWN" + OsUtils.LINE_SEPARATOR +
                 "   Workspace: topp" + OsUtils.LINE_SEPARATOR +
                 "   Connection Parameters:" + OsUtils.LINE_SEPARATOR +
-                "      url: file:data/taz_shapes" + OsUtils.LINE_SEPARATOR +
-                "      namespace: http://www.openplans.org/topp" + OsUtils.LINE_SEPARATOR;
+                "      namespace: http://www.openplans.org/topp" + OsUtils.LINE_SEPARATOR +
+                "      url: file:data/taz_shapes" + OsUtils.LINE_SEPARATOR;
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.GET), uri(url));
     }
@@ -118,7 +120,7 @@ public class DataStoreCommandsTest extends BaseTest {
         assertTrue(result);
         String actual = server.getCalls().get(0).getPostBody();
         String expected = "<dataStore><name>hydro</name><enabled>true</enabled>" +
-                "<connectionParameters><dbtype>h2</dbtype><database>test.db</database></connectionParameters>" +
+                "<connectionParameters><database>test.db</database><dbtype>h2</dbtype></connectionParameters>" +
                 "</dataStore>";
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.POST), uri(url));
@@ -139,21 +141,15 @@ public class DataStoreCommandsTest extends BaseTest {
         boolean result = commands.create(workspace, name, connectionParams, description, enabled);
         assertTrue(result);
         String actual = server.getCalls().get(0).getPostBody();
-        String expected = "{" +
-                "\"dataStore\":{" +
-                "\"enabled\":true," +
-                "\"name\":\"neo4j\"," +
-                "\"connectionParameters\":{" +
-                "\"entry\":[" +
-                "{" +
-                "\"@key\":\"The directory path of the neo4j database: \"," +
-                "\"$\":\"/opt/neo4j/data/graph.db\"" +
-                "}" +
-                "]" +
-                "}" +
-                "}" +
-                "}";
-        assertEquals(expected, actual);
+        JSONObject json = new JSONObject(actual);
+        assertNotNull(json.getJSONObject("dataStore"));
+        assertEquals("neo4j", json.getJSONObject("dataStore").get("name"));
+        assertNotNull(json.getJSONObject("dataStore").getJSONObject("connectionParameters"));
+        assertNotNull(json.getJSONObject("dataStore").getJSONObject("connectionParameters").getJSONArray("entry"));
+        assertEquals("The directory path of the neo4j database: ", json.getJSONObject("dataStore").getJSONObject("connectionParameters")
+                .getJSONArray("entry").getJSONObject(0).get("@key"));
+        assertEquals("/opt/neo4j/data/graph.db", json.getJSONObject("dataStore").getJSONObject("connectionParameters")
+                .getJSONArray("entry").getJSONObject(0).get("$"));
         verifyHttp(server).once(method(Method.POST), uri(url));
     }
 
@@ -193,21 +189,16 @@ public class DataStoreCommandsTest extends BaseTest {
         boolean result = commands.modify(workspace, name, connectionParams, description, enabled);
         assertTrue(result);
         String actual = server.getCalls().get(0).getPostBody();
-        String expected = "{" +
-                "\"dataStore\":{" +
-                "\"description\":\"The hydro lines for Tasmania\"," +
-                "\"name\":\"hydro\"," +
-                "\"connectionParameters\":{" +
-                "\"entry\":[" +
-                "{" +
-                "\"@key\":\"The directory path of the neo4j database: \"," +
-                "\"$\":\"/opt/neo4j/data/graph.db\"" +
-                "}" +
-                "]" +
-                "}" +
-                "}" +
-                "}";
-        assertEquals(expected, actual);
+        JSONObject json = new JSONObject(actual);
+        assertNotNull(json.getJSONObject("dataStore"));
+        assertEquals("hydro", json.getJSONObject("dataStore").get("name"));
+        assertEquals("The hydro lines for Tasmania", json.getJSONObject("dataStore").get("description"));
+        assertNotNull(json.getJSONObject("dataStore").getJSONObject("connectionParameters"));
+        assertNotNull(json.getJSONObject("dataStore").getJSONObject("connectionParameters").getJSONArray("entry"));
+        assertEquals("The directory path of the neo4j database: ", json.getJSONObject("dataStore").getJSONObject("connectionParameters")
+                .getJSONArray("entry").getJSONObject(0).get("@key"));
+        assertEquals("/opt/neo4j/data/graph.db", json.getJSONObject("dataStore").getJSONObject("connectionParameters")
+                .getJSONArray("entry").getJSONObject(0).get("$"));
         verifyHttp(server).once(method(Method.PUT), uri(url));
     }
 

@@ -36,8 +36,14 @@ public class PostGISCommandsTest extends BaseTest {
         String actual = server.getCalls().get(0).getPostBody();
         String expected = "<dataStore>" +
                 "<name>postgis</name><enabled>true</enabled>" +
-                "<connectionParameters><schema>ne</schema><port>5432</port><passwd>s$cr$t</passwd>" +
-                "<dbtype>postgis</dbtype><host>localhost</host><user>admin</user><database>naturalearth</database>" +
+                "<connectionParameters>" +
+                "<database>naturalearth</database>" +
+                "<dbtype>postgis</dbtype>" +
+                "<host>localhost</host>" +
+                "<passwd>s$cr$t</passwd>" +
+                "<port>5432</port>" +
+                "<schema>ne</schema>" +
+                "<user>admin</user>" +
                 "</connectionParameters></dataStore>";
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.POST), uri(url));
