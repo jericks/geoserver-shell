@@ -1,0 +1,4 @@
+{
+  "/**": "GET",
+  "/topp/**":"POST,DELETE,PUT"
+}

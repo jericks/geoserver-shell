@@ -1,0 +1,4 @@
+{
+  "*.*.r": "*",
+  "myworkspace.*.w": "ROLE_1,ROLE_2"
+}

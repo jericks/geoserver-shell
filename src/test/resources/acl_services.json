@@ -1,0 +1,4 @@
+{
+  "wfs.GetTransaction": "EDITOR",
+  "wfs.*": "*"
+}
