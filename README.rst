@@ -436,6 +436,36 @@ Commands
 
     * scripting session run --ext --name --script
 
+* acl security
+
+    * security acl get
+
+    * security acl set --mode MIXED
+
+    * security acl layers get
+
+    * security acl layers create --resource "myworkspace.*.w" --role "ROLE_1,ROLE_2"
+
+    * security acl layers modify --resource "myworkspace.*.w" --role "ROLE_1,ROLE_2,ROLE_3"
+
+    * security acl layers delete --resource "myworkspace.*.w"
+
+    * security acl services get
+
+    * security acl services create --resource "wfs.GetFeature" --role "ROLE_1,ROLE_2"
+
+    * security acl services modify --resource "wfs.GetFeature" --role "ROLE_1,ROLE_2,ROLE_3"
+
+    * security acl services delete --resource "wfs.GetFeature"
+
+    * security acl rest get
+
+    * security acl rest create --resource "/**:HEAD" --role ADMIN
+
+    * security acl rest modify --resource "/**:HEAD" --role "ADMIN,DEV"
+
+    * security acl rest delete --resource "/**:HEAD"
+
 Libraries
 ---------
 Spring Shell:
