@@ -39,12 +39,12 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-main</artifactId>
-            <version>13.2</version>
+            <version>13.6</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
-            <version>13.2</version>
+            <version>13.6</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
