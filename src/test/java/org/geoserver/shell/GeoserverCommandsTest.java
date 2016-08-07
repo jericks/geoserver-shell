@@ -1,18 +1,13 @@
 package org.geoserver.shell;
 
-import com.google.common.base.Function;
 import com.google.common.io.Resources;
-import com.xebialabs.restito.semantics.Action;
-import com.xebialabs.restito.semantics.Applicable;
+import com.xebialabs.restito.semantics.Function;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
 import org.glassfish.grizzly.http.Method;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.junit.Test;
-import org.springframework.shell.support.util.OsUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
