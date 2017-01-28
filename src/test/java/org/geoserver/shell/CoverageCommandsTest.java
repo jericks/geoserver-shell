@@ -143,7 +143,7 @@ public class CoverageCommandsTest extends BaseTest {
         boolean enabled = true;
         boolean result = commands.create(workspace, coveragestore, coverage, title, description, keywords, srs, enabled);
         assertTrue(result);
-        String expected = "<coverage><metadata /><keywords /><metadataLinks /><name>new</name><enabled>true</enabled></coverage>";
+        String expected = "<coverage><metadata /><keywords /><metadataLinks /><supportedFormats /><name>new</name><enabled>true</enabled></coverage>";
         String actual = server.getCalls().get(0).getPostBody();
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.POST), uri(url));
@@ -166,7 +166,7 @@ public class CoverageCommandsTest extends BaseTest {
         String enabled = null;
         boolean result = commands.modify(workspace, coveragestore, coverage, title, description, keywords, srs, enabled);
         assertTrue(result);
-        String expected = "<coverage><enabled>true</enabled><metadata /><keywords /><metadataLinks /><name>new</name><title>New Title</title><description>New Title</description></coverage>";
+        String expected = "<coverage><enabled>true</enabled><metadata /><keywords /><metadataLinks /><supportedFormats /><name>new</name><title>New Title</title><description>New Title</description></coverage>";
         String actual = server.getCalls().get(0).getPostBody();
         assertEquals(expected, actual);
         verifyHttp(server).once(method(Method.PUT), uri(url));
