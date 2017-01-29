@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/jericks/geoserver-shell.svg?branch=master
+    :target: https://travis-ci.org/jericks/geoserver-shell
+
 GeoServer Shell
 ===============
 Administer Geoserver using a command line interface (CLI).  Geoserver Shell uses the same shell interface used by Spring Roo and
@@ -487,5 +490,3 @@ License
 -------
 GeoServer Shell is open source and licensed under the MIT License.
 
-.. image:: https://travis-ci.org/jericks/geoserver-shell.svg?branch=master
-    :target: https://travis-ci.org/jericks/geoserver-shell
