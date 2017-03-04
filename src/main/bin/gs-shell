@@ -20,4 +20,4 @@ if [ ! -e "$LIBDIR" ]; then
   exit
 fi
 
-"$JAVA" -jar $LIBDIR/geoserver-shell-0.3-SNAPSHOT.jar "$@"
+"$JAVA" -jar $LIBDIR/geoserver-shell-0.3.0.jar "$@"
