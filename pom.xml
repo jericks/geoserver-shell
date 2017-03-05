@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.geoserver</groupId>
     <artifactId>geoserver-shell</artifactId>
-    <version>0.3.0</version>
+    <version>0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>geoserver-shell</name>
     <url>http://maven.apache.org</url>
