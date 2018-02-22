@@ -16,14 +16,21 @@
             <useProjectArtifact>true</useProjectArtifact>
         </dependencySet>
     </dependencySets>
-    <fileSets>
-        <fileSet>
-            <directory>${project.basedir}/src/main/bin</directory>
+    <files>
+        <file>
+            <source>${project.basedir}/src/main/bin/gs-shell</source>
             <outputDirectory>/bin</outputDirectory>
-            <includes>
-                <include>gs-shell*</include>
-            </includes>
-        </fileSet>
+            <filtered>true</filtered>
+            <fileMode>0755</fileMode>
+        </file>
+        <file>
+            <source>${project.basedir}/src/main/bin/gs-shell.bat</source>
+            <outputDirectory>/bin</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>0755</fileMode>
+        </file>
+    </files>
+    <fileSets>
 		<fileSet>
             <directory>${project.basedir}/src/main/man</directory>
             <outputDirectory>/man/man1</outputDirectory>
