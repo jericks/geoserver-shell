@@ -72,7 +72,7 @@ public class ScriptCommands implements CommandMarker {
             @CliOption(key = "file", mandatory = true, help = "The script File") File file
     ) throws Exception {
         String url = geoserver.getUrl() + "/rest/scripts/wps/" + URLUtil.encode(name);
-        String result = HTTPUtils.put(url, file, "plain/text", geoserver.getUser(), geoserver.getPassword());
+        String result = HTTPUtils.put(url, file, "text/plain", geoserver.getUser(), geoserver.getPassword());
         return result != null;
     }
 

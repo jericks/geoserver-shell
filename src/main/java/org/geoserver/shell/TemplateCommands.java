@@ -95,7 +95,7 @@ public class TemplateCommands implements CommandMarker {
             urlBuilder.append(URLUtil.encode(file.getName()));
         }
         // @ToDo Should this be post?
-        String result = HTTPUtils.put(urlBuilder.toString(), file, "plain/text", geoserver.getUser(), geoserver.getPassword());
+        String result = HTTPUtils.put(urlBuilder.toString(), file, "text/plain", geoserver.getUser(), geoserver.getPassword());
         return result != null;
     }
 
@@ -116,7 +116,7 @@ public class TemplateCommands implements CommandMarker {
         } else {
             urlBuilder.append(URLUtil.encode(file.getName()));
         }
-        String result = HTTPUtils.put(urlBuilder.toString(), file, "plain/text", geoserver.getUser(), geoserver.getPassword());
+        String result = HTTPUtils.put(urlBuilder.toString(), file, "text/plain", geoserver.getUser(), geoserver.getPassword());
         return result != null;
     }
 
