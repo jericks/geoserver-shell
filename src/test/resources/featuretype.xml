@@ -54,7 +54,7 @@
 			<minOccurs>0</minOccurs>
 			<maxOccurs>1</maxOccurs>
 			<nillable>true</nillable>
-			<binding>com.vividsolutions.jts.geom.MultiPoint</binding>
+			<binding>org.locationtech.jts.geom.MultiPoint</binding>
 		</attribute>
 		<attribute>
 			<name>CITY_NAME</name>

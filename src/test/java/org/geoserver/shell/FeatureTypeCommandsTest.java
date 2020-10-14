@@ -158,7 +158,7 @@ public class FeatureTypeCommandsTest extends BaseTest {
                 "   numDecimals: 0" + OsUtils.LINE_SEPARATOR +
                 "   Attributes: " + OsUtils.LINE_SEPARATOR +
                 "      the_geom" + OsUtils.LINE_SEPARATOR +
-                "         Binding: com.vividsolutions.jts.geom.MultiPoint" + OsUtils.LINE_SEPARATOR +
+                "         Binding: org.locationtech.jts.geom.MultiPoint" + OsUtils.LINE_SEPARATOR +
                 "         Min Occurs: 0" + OsUtils.LINE_SEPARATOR +
                 "         Max Occurs: 1" + OsUtils.LINE_SEPARATOR +
                 "         Nillable: true" + OsUtils.LINE_SEPARATOR +
@@ -252,7 +252,7 @@ public class FeatureTypeCommandsTest extends BaseTest {
         assertTrue(result);
         String actual = server.getCalls().get(0).getPostBody();
         String expected = "<featureType><name>taz_soils</name><attributes><attribute><name>the_geom</name>" +
-                "<binding>com.vividsolutions.jts.geom.LineString</binding></attribute><attribute>" +
+                "<binding>org.locationtech.jts.geom.LineString</binding></attribute><attribute>" +
                 "<name>name</name><binding>java.lang.String</binding></attribute><attribute>" +
                 "<name>id</name><binding>java.lang.Integer</binding></attribute></attributes>" +
                 "<srs>EPSG:4326</srs><title>Soils</title><description>Soil Survey Polygons</description>" +
