@@ -29,7 +29,7 @@ Build the code::
 
 Run the geoserver-shell::
 
-    target/gs-shell-app/gs-shell-1.0-SNAPSHOT/bin/gs-shell
+    target/gs-shell-1.0-SNAPSHOT/bin/gs-shell
 
 Examples
 --------
