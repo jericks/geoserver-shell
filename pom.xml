@@ -82,13 +82,9 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-<!--        <repository>-->
-<!--            <id>springsource-ext-release</id>-->
-<!--            <url>http://repo.springsource.org/simple/ext-release-local/</url>-->
-<!--        </repository>-->
         <repository>
             <id>geosolutions</id>
-            <url>http://maven.geo-solutions.it/</url>
+            <url>https://maven.geo-solutions.it/</url>
         </repository>
     </repositories>
     <build>
